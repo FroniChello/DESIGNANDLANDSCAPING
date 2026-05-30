@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Отзывы — Root & Rise</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #000000;
+            font-family: 'Kanit', 'Segoe UI', 'Poppins', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            color: #fff;
+            cursor: default;
+        }
+
+        /* Еле заметный круг за курсором (на мобильных отключается) */
+        .cursor-glow {
+            position: fixed;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(211, 97, 177, 0.12) 0%, rgba(211, 97, 177, 0.04) 40%, rgba(211, 97, 177, 0) 70%);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            filter: blur(18px);
+            will-change: left, top;
+        }
+        
+        .cursor-halo {
+            position: fixed;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 180, 200, 0.05) 0%, rgba(211, 97, 177, 0.02) 50%, transparent 80%);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 998;
+            filter: blur(28px);
+            will-change: left, top;
+        }
+
+        .site-container {
+            width: 100%;
+            max-width: 1920px;
+            margin: 0 auto;
+            background-color: #000000;
+            position: relative;
+            z-index: 2;
+            padding: 0 5% 0 5%;
+        }
+
+        /* Шапка */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 20px;
+            padding: 37px 0 20px 0;
+            background-color: #000000;
+            z-index: 10;
+        }
+
+        .logo-area {
+            width: clamp(55px, 7.2vw, 138px);
+            height: clamp(55px, 7.2vw, 138px);
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        .logo-area:active {
+            transform: scale(0.96);
+        }
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+        .brand-name {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 500;
+            font-size: clamp(16px, 1.8vw, 22px);
+            color: #FFFFFF;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            text-decoration: none;
+        }
+        .brand-name:active {
+            opacity: 0.7;
+        }
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(15px, 4vw, 60px);
+            margin-left: auto;
+        }
+        .nav-link {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 800;
+            font-size: clamp(16px, 2vw, 32px);
+            color: #FFFFFF;
+            text-decoration: none;
+            position: relative;
+            white-space: nowrap;
+            transition: opacity 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 0%;
+            height: 2px;
+            background: #ffffff;
+            transition: width 0.4s;
+            transform: translateX(-50%);
+        }
+        .nav-link:active {
+            transform: scale(0.97);
+        }
+
+        /* Заголовок */
+        .reviews-header {
+            margin: 40px 0 30px 0;
+            position: relative;
+        }
+        .reviews-title {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 800;
+            font-size: clamp(32px, 5vw, 68px);
+            color: #FFFFFF;
+            letter-spacing: 1px;
+        }
+        .accent-line {
+            width: 80px;
+            height: 3px;
+            background: #D361B1;
+            margin-top: 12px;
+            border-radius: 4px;
+        }
+        .reviews-header p {
+            font-size: clamp(14px, 4vw, 18px);
+            font-weight: 300;
+            margin-top: 16px;
+            max-width: 700px;
+        }
+
+        /* Сетка отзывов — адаптивная */
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin: 40px 0 60px;
+        }
+
+        .review-card {
+            background: rgba(20, 20, 30, 0.65);
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 28px 24px;
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            border: 1px solid rgba(211, 97, 177, 0.25);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+        .review-card:active {
+            transform: scale(0.98);
+            border-color: rgba(211, 97, 177, 0.6);
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .avatar {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #D361B1, #9b3c7a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 22px;
+            font-family: 'Kanit', sans-serif;
+            color: white;
+            box-shadow: 0 4px 12px rgba(211,97,177,0.3);
+            flex-shrink: 0;
+        }
+        .reviewer-name {
+            font-weight: 700;
+            font-size: clamp(18px, 5vw, 24px);
+            letter-spacing: 0.5px;
+        }
+        .review-date {
+            font-size: 12px;
+            opacity: 0.6;
+            font-weight: 300;
+            margin-top: 4px;
+        }
+        .stars {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 18px;
+        }
+        .star-filled {
+            color: #D361B1;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+        .star-empty {
+            color: #555;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+        .review-text {
+            font-size: clamp(14px, 4vw, 18px);
+            line-height: 1.5;
+            font-weight: 300;
+            color: #f0f0f0;
+            margin-bottom: 20px;
+        }
+        .project-tag {
+            display: inline-block;
+            background: rgba(211, 97, 177, 0.2);
+            border-radius: 60px;
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: 400;
+            color: #D361B1;
+            border: 1px solid rgba(211,97,177,0.4);
+        }
+
+        /* Блок с общей оценкой */
+        .rating-summary {
+            background: linear-gradient(135deg, rgba(211,97,177,0.15), rgba(0,0,0,0.6));
+            border-radius: 40px;
+            padding: 30px 28px;
+            margin: 20px 0 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 25px;
+            border: 1px solid rgba(211,97,177,0.3);
+        }
+        .rating-average {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .big-rating {
+            font-size: 52px;
+            font-weight: 800;
+            color: #D361B1;
+            line-height: 1;
+        }
+        .rating-label {
+            font-size: 16px;
+            font-weight: 400;
+        }
+        .rating-stars-big {
+            font-size: 22px;
+            letter-spacing: 4px;
+            color: #D361B1;
+        }
+        .rating-note {
+            font-weight: 300;
+            font-size: 15px;
+            opacity: 0.8;
+            max-width: 400px;
+        }
+
+        /* ========== ПОДВАЛ — ТОЧНО КАК В ФАЙЛЕ подвал.html, но с адаптацией ========== */
+        .footer {
+            width: 100%;
+            background: linear-gradient(to bottom, #000000, #FF3BA3);
+            position: relative;
+            color: white;
+            margin-top: 80px;
+            overflow: hidden;
+        }
+        
+        .footer__container {
+            max-width: 1920px;
+            margin: 0 auto;
+            position: relative;
+            width: 100%;
+            min-height: 1080px;
+        }
+
+        .footer__contacts {
+            position: absolute;
+            left: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 480px;
+        }
+
+        .phone-primary {
+            font-weight: 800;
+            font-size: 51px;
+            line-height: 1.1;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+        }
+        .phone-primary:active { opacity: 0.7; }
+
+        .label-primary {
+            font-weight: 800;
+            font-size: 24px;
+            margin-top: 5px;
+            line-height: 1.2;
+        }
+
+        .phone-secondary {
+            font-weight: 800;
+            font-size: 51px;
+            margin-top: 20px;
+            line-height: 1.1;
+            cursor: pointer;
+        }
+        .phone-secondary:active { opacity: 0.7; }
+
+        .label-secondary {
+            font-weight: 800;
+            font-size: 24px;
+            margin-top: 5px;
+            line-height: 1.2;
+        }
+
+        .social-icons {
+            margin-top: 70px;
+            display: flex;
+            align-items: center;
+            gap: 45px;
+        }
+
+        .social-icon {
+            width: 48px;
+            height: 48px;
+            background-color: rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            backdrop-filter: blur(2px);
+            border: 1px dashed rgba(255,255,255,0.6);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .social-icon:active {
+            transform: scale(0.95);
+            background-color: rgba(255, 59, 163, 0.5);
+        }
+
+        .footer__nav {
+            position: absolute;
+            right: 224px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 120px;
+        }
+
+        .nav-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-item {
+            font-weight: 400;
+            font-size: 24px;
+            color: white;
+            text-decoration: none;
+            line-height: 1.2;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            background: none;
+            border: none;
+            font-family: 'Kanit', sans-serif;
+        }
+        .nav-item:active {
+            opacity: 0.6;
+            transform: scale(0.98);
+        }
+
+        .footer__bottom {
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .white-line {
+            width: 1472px;
+            height: 2px;
+            background-color: white;
+            margin: 0 auto;
+        }
+
+        .footer__legal {
+            width: 1472px;
+            margin: 5px auto 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .copyright {
+            font-weight: 400;
+            font-size: 24px;
+            color: white;
+        }
+
+        .legal-links {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-right: -138px;
+        }
+
+        .legal-item {
+            font-weight: 400;
+            font-size: 24px;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            background: none;
+            border: none;
+            font-family: 'Kanit', sans-serif;
+        }
+        .legal-item:active {
+            opacity: 0.7;
+        }
+
+        /* Падающие лепестки */
+        .sakura-petal {
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 180, 200, 0.5);
+            border-radius: 50% 0 50% 0;
+            opacity: 0;
+            filter: blur(0.8px);
+            will-change: transform;
+        }
+        @keyframes sakuraFall {
+            0% { transform: translateY(-10vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.35; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(110vh) translateX(var(--sway, 30px)); opacity: 0; }
+        }
+
+        /* Ripple + анимации */
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(211,97,177,0.5) 50%, transparent);
+            transform: scale(0);
+            animation: rippleAnim 0.7s forwards;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            0% { transform: scale(0); opacity: 0.8; }
+            100% { transform: scale(6); opacity: 0; }
+        }
+        .petal-burst {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+            animation: petalFloat 1.3s forwards;
+        }
+        @keyframes petalFloat {
+            0% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(0.5);}
+            100% { opacity: 0; transform: translate(var(--dx3, 85px), var(--dy3, -130px)) rotate(var(--rot3, 55deg)) scale(0.5);}
+        }
+        @keyframes flashFade {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap');
+
+        /* ========== АДАПТАЦИЯ ПОДВАЛА ДЛЯ МОБИЛЬНЫХ ========== */
+        @media (max-width: 1600px) {
+            .white-line { width: 90%; }
+            .footer__legal { width: 90%; }
+            .legal-links { margin-right: 0; position: relative; right: auto; transform: none; }
+        }
+
+        @media (max-width: 1200px) {
+            .footer__nav { right: 40px; gap: 60px; }
+            .footer__contacts { left: 20px; width: 400px; }
+            .phone-primary, .phone-secondary { font-size: 40px; }
+            .label-primary, .label-secondary { font-size: 20px; }
+            .nav-item { font-size: 18px; }
+            .copyright, .legal-item { font-size: 18px; }
+        }
+
+        @media (max-width: 992px) {
+            .footer__container { min-height: auto; padding: 60px 5% 40px; }
+            .footer__contacts {
+                position: relative;
+                left: auto;
+                top: auto;
+                transform: none;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 50px;
+            }
+            .footer__nav {
+                position: relative;
+                right: auto;
+                top: auto;
+                transform: none;
+                justify-content: center;
+                gap: 60px;
+                flex-wrap: wrap;
+                margin-bottom: 50px;
+            }
+            .footer__bottom {
+                position: relative;
+                bottom: auto;
+                margin-top: 30px;
+            }
+            .social-icons { justify-content: center; }
+            .footer__legal {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            .legal-links {
+                position: relative;
+                transform: none;
+                justify-content: center;
+            }
+            .white-line { width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .site-container {
+                padding: 0 5% 0 5%;
+            }
+            
+            .header {
+                padding: 20px 0 15px 0;
+                gap: 12px;
+            }
+            
+            .logo-area {
+                width: 55px;
+                height: 55px;
+            }
+            
+            .brand-name {
+                font-size: 16px;
+                white-space: nowrap;
+            }
+            
+            .nav-links {
+                gap: 12px;
+                margin-left: auto;
+            }
+            
+            .nav-link {
+                font-size: 14px;
+                white-space: nowrap;
+            }
+            
+            .reviews-header {
+                margin: 25px 0 20px 0;
+            }
+            
+            .reviews-title {
+                font-size: 28px;
+            }
+            
+            .accent-line {
+                width: 60px;
+                height: 2px;
+                margin-top: 10px;
+            }
+            
+            .reviews-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+                margin: 30px 0 40px;
+            }
+            
+            .review-card {
+                padding: 22px 18px;
+                border-radius: 24px;
+            }
+            
+            .reviewer-info {
+                gap: 12px;
+                margin-bottom: 15px;
+            }
+            
+            .avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 18px;
+            }
+            
+            .reviewer-name {
+                font-size: 18px;
+            }
+            
+            .review-date {
+                font-size: 11px;
+            }
+            
+            .stars {
+                margin-bottom: 14px;
+            }
+            
+            .star-filled, .star-empty {
+                font-size: 16px;
+            }
+            
+            .review-text {
+                font-size: 14px;
+                line-height: 1.5;
+                margin-bottom: 16px;
+            }
+            
+            .project-tag {
+                font-size: 11px;
+                padding: 4px 12px;
+            }
+            
+            .rating-summary {
+                padding: 24px 20px;
+                border-radius: 32px;
+                flex-direction: column;
+                text-align: center;
+                gap: 18px;
+            }
+            
+            .rating-average {
+                justify-content: center;
+            }
+            
+            .big-rating {
+                font-size: 44px;
+            }
+            
+            .rating-stars-big {
+                font-size: 18px;
+                letter-spacing: 3px;
+            }
+            
+            .rating-label {
+                font-size: 14px;
+            }
+            
+            .rating-note {
+                font-size: 13px;
+                text-align: center;
+            }
+            
+            .footer__nav {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+            }
+            .nav-column {
+                align-items: center;
+                text-align: center;
+            }
+            .phone-primary, .phone-secondary {
+                font-size: 32px;
+            }
+            .label-primary, .label-secondary {
+                font-size: 16px;
+            }
+            .social-icons {
+                gap: 25px;
+            }
+            .social-icon {
+                width: 44px;
+                height: 44px;
+            }
+            .nav-item {
+                font-size: 16px;
+            }
+            .copyright, .legal-item {
+                font-size: 14px;
+            }
+            
+            .cursor-glow, .cursor-halo {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .site-container {
+                padding: 0 4% 0 4%;
+            }
+            
+            .header {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            
+            .logo-area {
+                width: 48px;
+                height: 48px;
+            }
+            
+            .brand-name {
+                font-size: 15px;
+            }
+            
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+                gap: 20px;
+                margin-left: 0;
+            }
+            
+            .nav-link {
+                font-size: 14px;
+            }
+            
+            .reviews-title {
+                font-size: 26px;
+            }
+            
+            .review-card {
+                padding: 18px 16px;
+            }
+            
+            .avatar {
+                width: 42px;
+                height: 42px;
+                font-size: 16px;
+            }
+            
+            .reviewer-name {
+                font-size: 16px;
+            }
+            
+            .review-text {
+                font-size: 13px;
+            }
+            
+            .big-rating {
+                font-size: 38px;
+            }
+            
+            .rating-stars-big {
+                font-size: 16px;
+            }
+            
+            .phone-primary, .phone-secondary {
+                font-size: 26px;
+            }
+            .label-primary, .label-secondary {
+                font-size: 14px;
+            }
+            .social-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 12px;
+            }
+            .nav-item {
+                font-size: 14px;
+            }
+            .copyright, .legal-item {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor-glow" id="cursorGlow"></div>
+    <div class="cursor-halo" id="cursorHalo"></div>
+
+    <div class="site-container">
+        <!-- Шапка -->
+        <div class="header">
+            <div class="logo-area" id="logoLink">
+                <img class="logo-img" src="Images/Logo.png" alt="Root & Rise Logo">
+            </div>
+            <div class="brand-name" id="brandLink">Root & Rise</div>
+            <div class="nav-links">
+                <button class="nav-link" id="homeBtn">Главная</button>
+                <button class="nav-link" id="aboutBtn">О нас</button>
+                <button class="nav-link" id="servicesBtn">Услуги</button>
+            </div>
+        </div>
+
+        <!-- Заголовок -->
+        <div class="reviews-header">
+            <div class="reviews-title">Отзывы</div>
+            <div class="accent-line"></div>
+            <p>Реальные впечатления клиентов о ландшафтном дизайне, озеленении и нашей работе</p>
+        </div>
+
+        <!-- Блок с общей оценкой -->
+        <div class="rating-summary">
+            <div class="rating-average">
+                <span class="big-rating">4.9</span>
+                <div>
+                    <div class="rating-stars-big">★★★★★</div>
+                    <div class="rating-label">на основе 47 отзывов</div>
+                </div>
+            </div>
+            <div class="rating-note">⭐ Клиенты высоко ценят внимательность к деталям, экологичность и уникальный стиль проектов Root & Rise</div>
+        </div>
+
+        <!-- Сетка отзывов -->
+        <div class="reviews-grid">
+            <div class="review-card">
+                <div class="reviewer-info">
+                    <div class="avatar">АМ</div>
+                    <div>
+                        <div class="reviewer-name">Анна Морозова</div>
+                        <div class="review-date">15 апреля 2026</div>
+                    </div>
+                </div>
+                <div class="stars">
+                    <span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span>
+                </div>
+                <div class="review-text">«Заказали комплексное озеленение загородного участка. Ребята из Root & Rise превзошли ожидания: грамотно подобрали растения, создали уютные зоны отдыха, продумали систему автополива.»</div>
+                <div class="project-tag">🌿 Проект «Сады Медового»</div>
+            </div>
+            <div class="review-card">
+                <div class="reviewer-info">
+                    <div class="avatar">ДК</div>
+                    <div>
+                        <div class="reviewer-name">Дмитрий Королёв</div>
+                        <div class="review-date">2 марта 2026</div>
+                    </div>
+                </div>
+                <div class="stars">
+                    <span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span>
+                </div>
+                <div class="review-text">«Обратился в компанию для разработки ландшафтного дизайна городского сквера. Очень понравился подход: архитекторы предложили нестандартные решения с вертикальным озеленением.»</div>
+                <div class="project-tag">🏙️ Общественное пространство «Зелёный Феникс»</div>
+            </div>
+            <div class="review-card">
+                <div class="reviewer-info">
+                    <div class="avatar">ЕП</div>
+                    <div>
+                        <div class="reviewer-name">Елена Павлова</div>
+                        <div class="review-date">20 февраля 2026</div>
+                    </div>
+                </div>
+                <div class="stars">
+                    <span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span>
+                </div>
+                <div class="review-text">«Преобразили наш частный дом до неузнаваемости. Разработали не просто клумбы, а настоящую среду обитания: зоны отдыха, японский уголок.»</div>
+                <div class="project-tag">🏡 Частная резиденция «Лесная Тишина»</div>
+            </div>
+            <div class="review-card">
+                <div class="reviewer-info">
+                    <div class="avatar">ИВ</div>
+                    <div>
+                        <div class="reviewer-name">Игорь Ветров</div>
+                        <div class="review-date">10 января 2026</div>
+                    </div>
+                </div>
+                <div class="stars">
+                    <span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span>
+                </div>
+                <div class="review-text">«Долго искал компанию для озеленения крыши бизнес-центра. Root & Rise предложили смелое и стильное решение с использованием засухоустойчивых растений.»</div>
+                <div class="project-tag">🏢 Экокрыша БЦ «Атмосфера»</div>
+            </div>
+            <div class="review-card">
+                <div class="reviewer-info">
+                    <div class="avatar">ТС</div>
+                    <div>
+                        <div class="reviewer-name">Татьяна Смирнова</div>
+                        <div class="review-date">5 декабря 2025</div>
+                    </div>
+                </div>
+                <div class="stars">
+                    <span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span>
+                </div>
+                <div class="review-text">«Студия помогла нам оформить придомовую территорию ЖК. Очень понравилось зонирование: детские площадки гармонично вписаны в зелёные зоны.»</div>
+                <div class="project-tag">🏙️ Жилой комплекс «Парковый»</div>
+            </div>
+            <div class="review-card">
+                <div class="reviewer-info">
+                    <div class="avatar">АК</div>
+                    <div>
+                        <div class="reviewer-name">Алексей Кузнецов</div>
+                        <div class="review-date">18 ноября 2025</div>
+                    </div>
+                </div>
+                <div class="stars">
+                    <span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-filled">★</span><span class="star-empty">★</span>
+                </div>
+                <div class="review-text">«Делали ландшафтный дизайн на участке в 25 соток. Понравилась презентация 3D-проекта — всё чётко и наглядно. Результат потрясающий.»</div>
+                <div class="project-tag">🌲 Коттеджный посёлок «Сосны»</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ПОДВАЛ ========== -->
+    <div class="footer">
+        <div class="footer__container">
+            <div class="footer__contacts">
+                <div class="phone-primary" id="phonePrimary">8(800) 808-00-08</div>
+                <div class="label-primary">контактный центр</div>
+                
+                <div class="phone-secondary" id="phoneSecondary">+7(767) 465-57-93</div>
+                <div class="label-secondary">отдел заботы о пользователях</div>
+                
+                <div class="social-icons">
+                    <div class="social-icon" data-social="vk"><span>VK</span></div>
+                    <div class="social-icon" data-social="tg"><span>TG</span></div>
+                    <div class="social-icon" data-social="wa"><span>WA</span></div>
+                </div>
+            </div>
+
+            <div class="footer__nav">
+                <div class="nav-column">
+                    <button class="nav-item" data-nav="product">Продукт</button>
+                    <button class="nav-item" data-nav="tariffs">Тарифы</button>
+                    <button class="nav-item" data-nav="apps">Приложения</button>
+                    <button class="nav-item" data-nav="updates">Обновления</button>
+                </div>
+                <div class="nav-column">
+                    <button class="nav-item" data-nav="about">О компании</button>
+                    <button class="nav-item" data-nav="docs">Документы</button>
+                    <button class="nav-item" data-nav="blog">Блог</button>
+                    <button class="nav-item" data-nav="jobs">Вакансии</button>
+                    <button class="nav-item" data-nav="contacts">Контакты</button>
+                </div>
+            </div>
+
+            <div class="footer__bottom">
+                <div class="white-line"></div>
+                <div class="footer__legal">
+                    <div class="copyright">Root & Rise, 2025-2026</div>
+                    <div class="legal-links">
+                        <button class="legal-item" data-legal="payment">Оплата</button>
+                        <button class="legal-item" data-legal="rules">Правила платформы</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Эффекты курсора (только на десктопе)
+        if (window.innerWidth > 768) {
+            (function() {
+                const cursorGlow = document.getElementById('cursorGlow');
+                const cursorHalo = document.getElementById('cursorHalo');
+                if (!cursorGlow || !cursorHalo) return;
+                let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0, haloX = 0, haloY = 0;
+                document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+                function animateCursor() {
+                    glowX += (mouseX - glowX) * 0.12;
+                    glowY += (mouseY - glowY) * 0.12;
+                    haloX += (mouseX - haloX) * 0.08;
+                    haloY += (mouseY - haloY) * 0.08;
+                    cursorGlow.style.left = glowX + 'px';
+                    cursorGlow.style.top = glowY + 'px';
+                    cursorHalo.style.left = haloX + 'px';
+                    cursorHalo.style.top = haloY + 'px';
+                    requestAnimationFrame(animateCursor);
+                }
+                animateCursor();
+            })();
+        }
+
+        // Падающие лепестки (адаптивное количество)
+        function createSakuraPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('sakura-petal');
+            const size = window.innerWidth < 768 ? 4 + Math.random() * 6 : 6 + Math.random() * 8;
+            petal.style.width = size + 'px';
+            petal.style.height = size + 'px';
+            const r = 255, g = 180 + Math.random() * 55, b = 190 + Math.random() * 50;
+            const alpha = 0.2 + Math.random() * 0.25;
+            petal.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            petal.style.borderRadius = Math.random() > 0.5 ? '50% 0 50% 0' : '0 50% 0 50%';
+            petal.style.left = Math.random() * window.innerWidth + 'px';
+            petal.style.top = '-20px';
+            const duration = 12 + Math.random() * 15;
+            petal.style.animation = `sakuraFall ${duration}s linear forwards`;
+            petal.style.setProperty('--sway', (Math.random() - 0.5) * (window.innerWidth < 768 ? 50 : 80) + 'px');
+            petal.style.animationDelay = Math.random() * 8 + 's';
+            document.body.appendChild(petal);
+            setTimeout(() => petal.remove(), (duration + 8) * 1000);
+        }
+        
+        let sakuraInterval;
+        function startSakuraFall() {
+            const initialCount = window.innerWidth < 768 ? 10 : 20;
+            for (let i = 0; i < initialCount; i++) setTimeout(() => createSakuraPetal(), i * 200);
+            sakuraInterval = setInterval(() => {
+                const count = window.innerWidth < 768 ? 1 : 2;
+                for (let i = 0; i < count; i++) createSakuraPetal();
+            }, window.innerWidth < 768 ? 2000 : 1300);
+        }
+        window.addEventListener('load', startSakuraFall);
+        window.addEventListener('beforeunload', () => clearInterval(sakuraInterval));
+
+        // Ripple эффекты
+        function createRipple(event, element) {
+            const rect = element.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height) * 1.3;
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple-effect');
+            let clientX = event.clientX, clientY = event.clientY;
+            if (!clientX || !clientY) { clientX = rect.left + rect.width/2; clientY = rect.top + rect.height/2; }
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            ripple.style.width = ripple.style.height = `${size}px`;
+            ripple.style.left = `${x - size/2}px`;
+            ripple.style.top = `${y - size/2}px`;
+            ripple.style.position = 'absolute';
+            element.style.position = 'relative';
+            element.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 650);
+        }
+
+        function burstPetals(centerX, centerY) {
+            const count = window.innerWidth < 768 ? 12 : 22;
+            for (let i = 0; i < count; i++) {
+                const angle = (i / count) * Math.PI * 2 + Math.random() * 0.7;
+                const petal = document.createElement('div');
+                petal.classList.add('petal-burst');
+                petal.innerHTML = '🌸';
+                petal.style.fontSize = `${(window.innerWidth < 768 ? 10 : 14) + Math.random() * (window.innerWidth < 768 ? 8 : 14)}px`;
+                petal.style.position = 'fixed';
+                petal.style.left = `${centerX + (Math.random() - 0.5) * (window.innerWidth < 768 ? 35 : 45)}px`;
+                petal.style.top = `${centerY + (Math.random() - 0.5) * (window.innerWidth < 768 ? 35 : 40)}px`;
+                petal.style.setProperty('--dx3', `${Math.cos(angle) * ((window.innerWidth < 768 ? 45 : 70) + Math.random() * (window.innerWidth < 768 ? 35 : 60))}px`);
+                petal.style.setProperty('--dy3', `${Math.sin(angle) * ((window.innerWidth < 768 ? 40 : 60) + Math.random() * (window.innerWidth < 768 ? 35 : 70)) - 40}px`);
+                petal.style.setProperty('--rot3', `${(Math.random() - 0.5) * 80 + 45}deg`);
+                document.body.appendChild(petal);
+                setTimeout(() => petal.remove(), 1300);
+            }
+        }
+
+        // Универсальная функция для обработки нажатий с переходом
+        function makeClickableWithRedirect(element, targetUrl) {
+            if (!element) return;
+            const handler = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                let clientX = e.clientX, clientY = e.clientY;
+                if (e.touches) {
+                    const touch = e.touches[0] || (e.changedTouches ? e.changedTouches[0] : null);
+                    if (touch) { clientX = touch.clientX; clientY = touch.clientY; }
+                }
+                createRipple({ clientX, clientY }, element);
+                burstPetals(clientX || element.getBoundingClientRect().left + element.offsetWidth/2, clientY || element.getBoundingClientRect().top + element.offsetHeight/2);
+                if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(35);
+                element.style.transform = 'scale(0.96)';
+                setTimeout(() => { if(element) element.style.transform = ''; }, 160);
+                const flash = document.createElement('div');
+                flash.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(211,97,177,0.25); pointer-events:none; z-index:9998; animation:flashFade 0.4s ease-out forwards;';
+                document.body.appendChild(flash);
+                setTimeout(() => flash.remove(), 400);
+                setTimeout(() => { window.location.href = targetUrl; }, 100);
+            };
+            element.addEventListener('mousedown', handler);
+            element.addEventListener('touchstart', handler, { passive: false });
+        }
+
+        // Навигация
+        makeClickableWithRedirect(document.getElementById('logoLink'), 'index.html');
+        makeClickableWithRedirect(document.getElementById('brandLink'), 'index.html');
+        makeClickableWithRedirect(document.getElementById('homeBtn'), 'index.html');
+        makeClickableWithRedirect(document.getElementById('aboutBtn'), 'about.html');
+        makeClickableWithRedirect(document.getElementById('servicesBtn'), 'services.html');
+
+        // Телефоны
+        const phonePrimary = document.getElementById('phonePrimary');
+        const phoneSecondary = document.getElementById('phoneSecondary');
+        if (phonePrimary) {
+            phonePrimary.addEventListener('click', () => window.location.href = 'tel:88008080008');
+            phonePrimary.addEventListener('touchstart', (e) => { e.preventDefault(); window.location.href = 'tel:88008080008'; });
+        }
+        if (phoneSecondary) {
+            phoneSecondary.addEventListener('click', () => window.location.href = 'tel:+77674655793');
+            phoneSecondary.addEventListener('touchstart', (e) => { e.preventDefault(); window.location.href = 'tel:+77674655793'; });
+        }
+
+        // Соцсети
+        const socialVk = document.querySelector('[data-social="vk"]');
+        const socialTg = document.querySelector('[data-social="tg"]');
+        const socialWa = document.querySelector('[data-social="wa"]');
+        if (socialVk) socialVk.addEventListener('click', () => window.open('https://vk.com', '_blank'));
+        if (socialTg) socialTg.addEventListener('click', () => window.open('https://t.me', '_blank'));
+        if (socialWa) socialWa.addEventListener('click', () => window.open('https://wa.me', '_blank'));
+
+        // Добавляем эффекты нажатия для всех кликабельных элементов без перехода
+        const clickableItems = document.querySelectorAll('.nav-item, .legal-item, .review-card');
+        clickableItems.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                let clientX = e.clientX, clientY = e.clientY;
+                if (e.touches) {
+                    const touch = e.touches[0];
+                    if (touch) { clientX = touch.clientX; clientY = touch.clientY; }
+                }
+                createRipple({ clientX, clientY }, btn);
+                burstPetals(clientX || btn.getBoundingClientRect().left + btn.offsetWidth/2, clientY || btn.getBoundingClientRect().top + btn.offsetHeight/2);
+                if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(20);
+                btn.style.transform = 'scale(0.97)';
+                setTimeout(() => { if(btn) btn.style.transform = ''; }, 150);
+            });
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                createRipple({ clientX: touch.clientX, clientY: touch.clientY }, btn);
+                burstPetals(touch.clientX, touch.clientY);
+                if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(20);
+                btn.style.transform = 'scale(0.97)';
+                setTimeout(() => { if(btn) btn.style.transform = ''; }, 150);
+            }, { passive: false });
+        });
+
+        // Анимация появления карточек
+        const cards = document.querySelectorAll('.review-card');
+        const appearObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0px)';
+                }
+            });
+        }, { threshold: 0.1 });
+        cards.forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            appearObserver.observe(card);
+        });
+    </script>
+</body>
+</html>

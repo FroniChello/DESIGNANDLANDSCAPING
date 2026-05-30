@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Root & Rise — Дизайн среды и озеленения</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* Убираем серый фон при тапе на мобилках */
+        }
+
+        body {
+            background-color: #000000;
+            font-family: 'Kanit', 'Segoe UI', 'Poppins', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            cursor: default;
+        }
+
+        .site-container {
+            width: 100%;
+            max-width: 1920px;
+            margin: 0 auto;
+            background-color: #000000;
+            position: relative;
+            padding-bottom: 0;
+            z-index: 2;
+        }
+        
+        /* ========== КРУЖОК ЗА КУРСОРОМ (скрыт на тач-устройствах) ========== */
+        .cursor-glow {
+            position: fixed;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(211, 97, 177, 0.12) 0%, rgba(211, 97, 177, 0.04) 40%, rgba(211, 97, 177, 0) 70%);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            filter: blur(18px);
+            transition: all 0.08s ease-out;
+            will-change: left, top;
+        }
+        
+        .cursor-halo {
+            position: fixed;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 180, 200, 0.05) 0%, rgba(211, 97, 177, 0.02) 50%, transparent 80%);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 998;
+            filter: blur(28px);
+            will-change: left, top;
+            transition: all 0.12s ease-out;
+        }
+        
+        /* ========== ШАПКА ========== */
+        .header {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 20px;
+            padding: 37px 5% 20px 5%;
+            background-color: #000000;
+            z-index: 10;
+        }
+
+        .logo-area {
+            width: clamp(70px, 7.2vw, 138px);
+            height: clamp(70px, 7.2vw, 138px);
+            flex-shrink: 0;
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .logo-area.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            border-radius: 8px;
+        }
+
+        .brand-name {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 500;
+            font-size: clamp(18px, 1.8vw, 22px);
+            color: #FFFFFF;
+            white-space: nowrap;
+            flex-shrink: 0;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.5s ease-out 0.05s, transform 0.5s ease-out 0.05s;
+        }
+        .brand-name.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .search-wrapper {
+            position: relative;
+            width: clamp(60px, 4.2vw, 80px);
+            height: clamp(60px, 4.2vw, 80px);
+            flex-shrink: 0;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.5s ease-out 0.1s, transform 0.5s ease-out 0.1s;
+        }
+        .search-wrapper.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .search-icon {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>') no-repeat center;
+            background-size: 55%;
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .search-input-field {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: #D9D9D9;
+            border-radius: 60px;
+            border: none;
+            outline: none;
+            font-family: 'Kanit', sans-serif;
+            font-size: clamp(14px, 1.2vw, 20px);
+            padding: 0 20px;
+            color: #000;
+            font-weight: 400;
+            transition: all 0.55s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            text-align: left;
+        }
+        .search-input-field::placeholder {
+            color: rgba(0,0,0,0.55);
+            font-weight: 300;
+            font-size: clamp(12px, 1.1vw, 18px);
+        }
+
+        @media (min-width: 769px) {
+            .search-icon { left: 0; right: auto; }
+            .search-input-field { left: 0; right: auto; transform-origin: left center; }
+            .search-wrapper:hover .search-icon { opacity: 0; transform: rotate(180deg) scale(0.5); }
+            .search-wrapper:hover .search-input-field { opacity: 1; width: clamp(280px, 24vw, 468px); transform: scale(1); pointer-events: auto; left: 0; right: auto; }
+        }
+        
+        @media (max-width: 768px) {
+            .search-icon { right: 0; left: auto; }
+            .search-input-field { right: 0; left: auto; transform-origin: right center; }
+            .search-wrapper:active .search-icon { opacity: 0; transform: rotate(180deg) scale(0.5); }
+            .search-wrapper:active .search-input-field { opacity: 1; width: clamp(200px, 55vw, 300px); transform: scale(1); pointer-events: auto; right: 0; left: auto; }
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(20px, 4vw, 60px);
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .nav-link {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 800;
+            font-size: clamp(20px, 2vw, 32px);
+            color: #FFFFFF;
+            text-decoration: none;
+            position: relative;
+            white-space: nowrap;
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        
+        .nav-link:nth-child(1) { transition-delay: 0.15s; }
+        .nav-link:nth-child(2) { transition-delay: 0.2s; }
+        .nav-link:nth-child(3) { transition-delay: 0.25s; }
+        
+        .nav-link.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 0%;
+            height: 2px;
+            background: #ffffff;
+            transition: width 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 70%;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-3px);
+        }
+
+        .nav-link:active {
+            animation: fastFog 0.35s ease-out forwards;
+        }
+        
+        .nav-link:active::after {
+            animation: fastFogLine 0.35s ease-out forwards;
+        }
+
+        .service-item {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 800;
+            font-size: clamp(24px, 3vw, 32px);
+            color: #FFFFFF;
+            white-space: nowrap;
+            position: relative;
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        
+        .service-item:nth-child(1) { transition-delay: 0s; }
+        .service-item:nth-child(2) { transition-delay: 0.1s; }
+        .service-item:nth-child(3) { transition-delay: 0.2s; }
+        
+        .service-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .service-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 0%;
+            height: 2px;
+            background: #ffffff;
+            transition: width 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            transform: translateX(-50%);
+        }
+
+        .service-item:hover::after {
+            width: 70%;
+        }
+        
+        .service-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .service-item:active {
+            animation: fastFog 0.35s ease-out forwards;
+        }
+        
+        .service-item:active::after {
+            animation: fastFogLine 0.35s ease-out forwards;
+        }
+
+        @keyframes fastFog {
+            0% { opacity: 1; filter: blur(0px); text-shadow: 0 0 0px rgba(255,255,255,0); }
+            50% { opacity: 0; filter: blur(4px); text-shadow: 0 0 8px rgba(255,255,255,0.5); }
+            100% { opacity: 1; filter: blur(0px); text-shadow: 0 0 0px rgba(255,255,255,0); }
+        }
+
+        @keyframes fastFogLine {
+            0% { width: 70%; opacity: 1; }
+            50% { width: 100%; opacity: 0; }
+            100% { width: 70%; opacity: 1; }
+        }
+
+        /* ========== HERO СЕКЦИЯ ========== */
+        .hero-section {
+            padding: 40px 5% 60px 5%;
+            position: relative;
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        .hero-grid {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            flex: 1.2;
+            min-width: 280px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .main-headline {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 700;
+            font-size: clamp(32px, 5vw, 68px);
+            line-height: 1.2;
+            color: #FFFFFF;
+            margin-bottom: 24px;
+            max-width: 600px;
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .main-headline.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .subheadline {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 300;
+            font-size: clamp(16px, 1.8vw, 22px);
+            color: #FFFFFF;
+            margin-bottom: 40px;
+            line-height: 1.4;
+            max-width: 680px;
+            white-space: normal; /* фикс для телефона чтобы не было горизонтального скролла */
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: opacity 0.6s ease-out 0.1s, transform 0.6s ease-out 0.1s;
+        }
+        .subheadline.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .order-btn-container {
+            width: clamp(260px, 18vw, 296px);
+            height: clamp(55px, 4vw, 62px);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out 0.2s, transform 0.6s ease-out 0.2s;
+        }
+        .order-btn-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .order-btn-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .magic-btn {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(18px, 1.8vw, 24px);
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #ffffff;
+            background: #D361B1;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.45s cubic-bezier(0.2, 0.95, 0.4, 1.2);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Kanit', sans-serif;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 25px rgba(211, 97, 177, 0.4);
+        }
+
+        .magic-btn:hover {
+            transform: scale(1.02) translateY(-3px);
+            background: #D361B1;
+            box-shadow: 0 20px 40px rgba(211, 97, 177, 0.5);
+        }
+        .magic-btn:active { transform: scale(0.97); }
+        .magic-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 80%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 200, 230, 0.7), rgba(255, 160, 210, 0.9), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.6s;
+            pointer-events: none;
+        }
+        .magic-btn:hover::before { left: 120%; }
+
+        /* ========== ИЗОБРАЖЕНИЕ ЦВЕТКА ========== */
+        .flower-image {
+            position: absolute;
+            right: 0;
+            top: calc(50% + 10px);
+            transform: translateY(-50%);
+            width: 55%;
+            max-width: 900px;
+            min-width: 500px;
+            z-index: 0;
+            opacity: 0;
+            transform: translateY(calc(-50% + 30px)) scale(0.9);
+            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.2), transform 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            pointer-events: none;
+        }
+        .flower-image.visible {
+            opacity: 0.7;
+            transform: translateY(-50%) scale(1);
+        }
+        .flower-img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* ========== СЕКЦИЯ УСЛУГ ========== */
+        .services-section {
+            padding: 0 5%;
+            margin-top: 80px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .white-line {
+            width: min(1065px, 80%);
+            height: 2px;
+            background-color: #FFFFFF;
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .white-line.visible {
+            opacity: 1;
+            transform: scaleX(1);
+        }
+
+        .services-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(30px, 8vw, 80px);
+            margin-bottom: 60px;
+        }
+
+        /* ========== СЕКЦИЯ НОВОСТЕЙ ========== */
+        .news-section {
+            position: relative;
+            padding: 0 5%;
+            margin-top: 40px;
+            min-height: 650px;
+            overflow: hidden;
+        }
+
+        .slanted-shape {
+            position: absolute;
+            left: 200px;
+            top: 20px;
+            width: 1578px;
+            height: 650px;
+            background: rgba(255, 59, 163, 0.6);
+            clip-path: polygon(237px 0%, 100% 0%, 100% 100%, 0% 100%);
+            transform: skewX(0deg);
+            transform-origin: top left;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transform: translateX(-100px) scale(0.95);
+            transition: opacity 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.2), transform 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+        }
+        
+        .slanted-shape.visible {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+
+        .tree-image {
+            position: absolute;
+            left: -80px;
+            top: -50px;
+            width: 800px;
+            height: auto;
+            z-index: 0;
+            opacity: 0;
+            transform: translateX(-50px) scale(0.95);
+            transition: opacity 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.2), transform 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            pointer-events: none;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .tree-image.visible {
+            opacity: 0.5;
+            transform: translateX(0) scale(1);
+        }
+        
+        .tree-image img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        .news-content {
+            position: relative;
+            z-index: 10;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 20px 60px 20px;
+            text-align: left;
+            opacity: 0;
+            transform: translateX(180px) translateY(30px);
+            transition: opacity 0.7s ease-out 0.2s, transform 0.7s ease-out 0.2s;
+        }
+        
+        .news-content.visible {
+            opacity: 1;
+            transform: translateX(150px) translateY(0);
+        }
+
+        .news-title {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 800;
+            font-size: clamp(26px, 3.8vw, 44px);
+            color: #FFFFFF;
+            margin-bottom: 25px;
+            z-index: 15;
+            position: relative;
+            background: transparent;
+            text-align: left;
+        }
+
+        .news-text {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 300;
+            font-size: clamp(16px, 1.6vw, 20px);
+            line-height: 1.5;
+            color: #FFFFFF;
+            z-index: 15;
+            position: relative;
+            max-width: 800px;
+            margin: 0;
+            text-align: left;
+        }
+
+        /* ========== НИЖНИЙ ФРЕЙМ 1920x1080 ========== */
+        .fullscreen-frame {
+            width: 100%;
+            height: 1080px;
+            position: relative;
+            background-color: #000000;
+            margin-top: 80px;
+            overflow: hidden;
+        }
+
+        .frame-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        .frame-text {
+            position: absolute;
+            left: 230px;
+            top: 230px;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 400;
+            font-size: 24px;
+            line-height: 1.4;
+            color: #FFFFFF;
+            max-width: 600px;
+            text-align: left;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        
+        .frame-text.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .buttons-wrapper {
+            position: absolute;
+            right: 230px;
+            top: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 55px;
+            z-index: 2;
+        }
+
+        .btn-with-branch {
+            position: relative;
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.2), transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            cursor: pointer;
+        }
+        
+        .btn-with-branch.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .frame-btn {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 600;
+            font-size: 26px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            background: #D361B1;
+            border: none;
+            border-radius: 60px;
+            padding: 34px 97px 34px 57px;
+            min-width: 374px;
+            cursor: pointer;
+            text-align: left;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(211, 97, 177, 0.3);
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            z-index: 1;
+        }
+        
+        .btn-with-branch:not(:hover) .frame-btn {
+            animation: gentlePulse 2s infinite;
+        }
+        
+        @keyframes gentlePulse {
+            0% { box-shadow: 0 4px 15px rgba(211, 97, 177, 0.3); }
+            50% { box-shadow: 0 8px 25px rgba(211, 97, 177, 0.5); }
+            100% { box-shadow: 0 4px 15px rgba(211, 97, 177, 0.3); }
+        }
+
+        .btn-with-branch:hover .frame-btn {
+            transform: translateY(-3px) scale(1.02);
+            background: #e07bc2;
+            box-shadow: 0 15px 35px rgba(211, 97, 177, 0.6);
+            animation: none;
+        }
+        
+        .frame-btn:active {
+            transform: scale(0.96);
+        }
+        
+        .frame-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-with-branch:hover .frame-btn::before {
+            left: 100%;
+        }
+
+        .branch-under-btn-v {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(calc(-50% + 35px));
+            z-index: 200;
+            pointer-events: none;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: calc(100% + 40px);
+            top: -40px;
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+        }
+        
+        .branch-under-btn-v img {
+            display: block;
+            width: auto;
+            height: 100%;
+            max-width: none;
+            background: transparent;
+            object-fit: contain;
+            object-position: bottom;
+            filter: drop-shadow(0 0 4px rgba(0,0,0,0.3));
+            mix-blend-mode: multiply;
+            transform: scale(2);
+            transform-origin: bottom center;
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2), filter 0.3s ease;
+        }
+        
+        .btn-with-branch:hover .branch-under-btn-v img {
+            transform: scale(2.2);
+            filter: drop-shadow(0 0 8px rgba(211, 97, 177, 0.5));
+        }
+
+        .branch-under-btn-n {
+            position: absolute;
+            top: calc(15% - 3px + 1px);
+            bottom: calc(15% - 3px + 1px);
+            left: 50%;
+            transform: translateX(calc(-50% + 35px));
+            z-index: 200;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: calc(70% + 6px - 2px);
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+        }
+        
+        .branch-under-btn-n img {
+            display: block;
+            width: auto;
+            height: 100%;
+            max-width: none;
+            background: transparent;
+            object-fit: contain;
+            object-position: center;
+            filter: drop-shadow(0 0 4px rgba(0,0,0,0.3));
+            mix-blend-mode: multiply;
+            transform: scale(1.35);
+            transform-origin: center center;
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2), filter 0.3s ease;
+        }
+        
+        .btn-with-branch:hover .branch-under-btn-n img {
+            transform: scale(1.55);
+            filter: drop-shadow(0 0 8px rgba(211, 97, 177, 0.5));
+        }
+
+        /* Ripple эффект */
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.7) 0%, rgba(211, 97, 177, 0.5) 50%, transparent);
+            transform: scale(0);
+            animation: rippleAnim 0.7s forwards;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            0% { transform: scale(0); opacity: 0.8; }
+            100% { transform: scale(6); opacity: 0; }
+        }
+        
+        .petal-burst {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+            animation: petalFloat 1.3s forwards;
+        }
+        @keyframes petalFloat {
+            0% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(0.5);}
+            100% { opacity: 0; transform: translate(var(--dx3, 85px), var(--dy3, -130px)) rotate(var(--rot3, 55deg)) scale(0.5);}
+        }
+
+        /* НОВАЯ КНОПКА ЛИЧНОГО КАБИНЕТА */
+        .account-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: clamp(50px, 4.5vw, 70px);
+            height: clamp(50px, 4.5vw, 70px);
+            background: #D361B1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 8px 20px rgba(211, 97, 177, 0.5);
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(2px);
+        }
+        .account-button:hover {
+            transform: scale(1.08) translateY(-3px);
+            background: #e07bc2;
+            box-shadow: 0 12px 28px rgba(211, 97, 177, 0.7);
+        }
+        .account-button:active {
+            transform: scale(0.95);
+        }
+        .account-icon-svg {
+            width: 55%;
+            height: 55%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+        .account-label {
+            position: absolute;
+            bottom: -28px;
+            font-size: 11px;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 500;
+            color: white;
+            background: rgba(0,0,0,0.6);
+            padding: 2px 8px;
+            border-radius: 20px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .account-button:hover .account-label {
+            opacity: 1;
+        }
+
+        /* ========== ПОДВАЛ ========== */
+        .footer {
+            width: 100%;
+            height: 1080px;
+            background: linear-gradient(to bottom, #000000, #FF3BA3);
+            margin: 50px 0 0 0;
+            position: relative;
+            color: white;
+        }
+        .footer__contacts {
+            position: absolute;
+            left: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 480px;
+        }
+        .phone-primary {
+            font-weight: 800;
+            font-size: 51px;
+            line-height: 1.1;
+            letter-spacing: 0.5px;
+        }
+        .label-primary {
+            font-weight: 800;
+            font-size: 24px;
+            margin-top: 5px;
+            line-height: 1.2;
+        }
+        .phone-secondary {
+            font-weight: 800;
+            font-size: 51px;
+            margin-top: 20px;
+            line-height: 1.1;
+        }
+        .label-secondary {
+            font-weight: 800;
+            font-size: 24px;
+            margin-top: 5px;
+            line-height: 1.2;
+        }
+        .social-icons {
+            margin-top: 70px;
+            display: flex;
+            align-items: center;
+            gap: 45px;
+        }
+        .social-icon {
+            width: 48px;
+            height: 48px;
+            background-color: rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            backdrop-filter: blur(2px);
+            border: 1px dashed rgba(255,255,255,0.6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .social-icon:hover {
+            background-color: rgba(255, 255, 255, 0.45);
+            transform: scale(1.05);
+        }
+        .social-icon span {
+            background: rgba(0,0,0,0.2);
+            padding: 2px 6px;
+            border-radius: 20px;
+        }
+        .footer__nav {
+            position: absolute;
+            right: 224px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 120px;
+        }
+        .nav-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .footer-nav-item {
+            font-weight: 400;
+            font-size: 24px;
+            color: white;
+            text-decoration: none;
+            line-height: 1.2;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+            background: none;
+            border: none;
+            text-align: left;
+            font-family: 'Kanit', sans-serif;
+        }
+        .footer-nav-item:hover {
+            opacity: 0.8;
+            transform: translateX(3px);
+        }
+        .footer__bottom {
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .white-line-footer {
+            width: 1472px;
+            height: 2px;
+            background-color: white;
+            margin: 0 auto;
+        }
+        .footer__legal {
+            width: 1472px;
+            margin: 5px auto 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        .copyright {
+            font-weight: 400;
+            font-size: 24px;
+            color: white;
+            position: relative;
+            left: 30px;
+        }
+        .legal-links {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-right: -138px;
+        }
+        .legal-item {
+            font-weight: 400;
+            font-size: 24px;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: 'Kanit', sans-serif;
+            transition: opacity 0.2s;
+            position: relative;
+            left: -150px;
+        }
+        .legal-item:hover {
+            opacity: 0.8;
+        }
+        
+        /* Плавная прокрутка */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* ========== ПАДАЮЩИЕ ЛЕПЕСТКИ САКУРЫ ========== */
+        .sakura-petal {
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 180, 200, 0.5);
+            border-radius: 50% 0 50% 0;
+            opacity: 0;
+            filter: blur(0.8px);
+            will-change: transform;
+            transition: none;
+        }
+        
+        @keyframes sakuraFall {
+            0% {
+                transform: translateY(-10vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.35;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(110vh) translateX(var(--sway, 30px));
+                opacity: 0;
+            }
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap');
+        
+        @media (max-width: 1400px) {
+            .footer__nav { right: 80px; gap: 80px; }
+            .white-line-footer { width: 90%; }
+            .footer__legal { width: 90%; }
+            .legal-links { margin-right: 0; }
+            .legal-item { left: -100px; }
+            .copyright { left: 20px; }
+        }
+        @media (max-width: 1100px) {
+            .footer { height: auto; min-height: 1080px; margin-top: 50px; }
+            .footer__contacts { position: relative; left: 5%; top: 80px; transform: none; width: 90%; }
+            .footer__nav { position: relative; right: auto; top: auto; transform: none; justify-content: center; margin-top: 120px; flex-wrap: wrap; gap: 60px; }
+            .footer__bottom { position: relative; bottom: auto; margin-top: 100px; padding-bottom: 60px; }
+            .legal-item { left: 0; }
+            .copyright { left: 0; }
+        }
+        
+        /* ========== МОБИЛЬНАЯ АДАПТАЦИЯ (ТОЛЬКО ДЛЯ ТЕЛЕФОНА) ========== */
+        @media (max-width: 768px) {
+            .cursor-glow, .cursor-halo { display: none; }
+            
+            .header { padding: 20px 5% 15px 5%; gap: 12px; flex-wrap: wrap; justify-content: center; }
+            .logo-area { width: 70px; height: 70px; }
+            .brand-name { font-size: 18px; }
+            .search-wrapper { width: 55px; height: 55px; }
+            .nav-links { width: 100%; justify-content: center; margin-left: 0; margin-top: 10px; gap: 25px; }
+            .nav-link { font-size: 16px; }
+            .nav-link::after { display: none; }
+            
+            .hero-section { padding: 30px 5% 40px 5%; }
+            .hero-grid { flex-direction: column; gap: 30px; }
+            .hero-content { text-align: center; min-width: auto; }
+            .main-headline { font-size: 32px; max-width: 100%; }
+            .subheadline { font-size: 16px; white-space: normal; max-width: 100%; }
+            .order-btn-container { width: 220px; height: 50px; margin: 0 auto; }
+            .magic-btn { font-size: 16px; }
+            
+            .flower-image { position: relative; right: auto; top: auto; transform: none; width: 80%; max-width: 300px; min-width: auto; margin: 0 auto; }
+            .flower-image.visible { transform: scale(1); opacity: 0.8; }
+            
+            .services-section { margin-top: 40px; }
+            .white-line { width: 100%; margin-bottom: 25px; }
+            .services-list { flex-direction: column; gap: 15px; align-items: center; }
+            .service-item { font-size: 24px; white-space: normal; text-align: center; }
+            
+            .news-section { min-height: auto; margin-top: 20px; }
+            .slanted-shape, .tree-image { display: none; }
+            .news-content { transform: none; padding: 30px 15px; text-align: center; }
+            .news-content.visible { transform: none; }
+            .news-title { font-size: 28px; text-align: center; }
+            .news-text { font-size: 16px; text-align: center; }
+            
+            .fullscreen-frame { height: auto; min-height: auto; margin-top: 40px; padding: 40px 5%; }
+            .frame-content { position: relative; display: flex; flex-direction: column; gap: 30px; }
+            .frame-text { position: relative; left: auto; top: auto; font-size: 18px; text-align: center; max-width: 100%; transform: none; }
+            .frame-text.visible { transform: none; }
+            .buttons-wrapper { position: relative; right: auto; top: auto; align-items: center; gap: 20px; }
+            .btn-with-branch { transform: none; }
+            .btn-with-branch.visible { transform: none; }
+            .frame-btn { padding: 12px 30px; min-width: 220px; font-size: 16px; text-align: center; white-space: normal; }
+            .branch-under-btn-v, .branch-under-btn-n { display: none; }
+            
+            .footer { height: auto; min-height: auto; margin-top: 30px; padding: 40px 5%; }
+            .footer__contacts { position: relative; left: auto; top: auto; transform: none; width: 100%; text-align: center; margin-bottom: 30px; }
+            .phone-primary, .phone-secondary { font-size: 28px; }
+            .label-primary, .label-secondary { font-size: 16px; }
+            .social-icons { margin-top: 25px; justify-content: center; gap: 20px; }
+            .social-icon { width: 40px; height: 40px; font-size: 12px; }
+            .footer__nav { position: relative; right: auto; top: auto; transform: none; justify-content: center; gap: 30px; margin: 30px 0; }
+            .nav-column { align-items: center; }
+            .footer-nav-item { font-size: 16px; text-align: center; }
+            .footer__bottom { position: relative; bottom: auto; margin-top: 20px; }
+            .white-line-footer { width: 100%; }
+            .footer__legal { flex-direction: column; gap: 15px; text-align: center; }
+            .copyright { font-size: 14px; left: auto; }
+            .legal-links { position: relative; right: auto; top: auto; transform: none; justify-content: center; margin-right: 0; }
+            .legal-item { font-size: 14px; left: auto; }
+            
+            .account-button { width: 45px; height: 45px; bottom: 15px; right: 15px; }
+            .account-label { font-size: 9px; bottom: -24px; }
+        }
+        
+        @media (max-width: 480px) {
+            .header { gap: 8px; }
+            .logo-area { width: 55px; height: 55px; }
+            .brand-name { font-size: 16px; }
+            .search-wrapper { width: 45px; height: 45px; }
+            .nav-link { font-size: 14px; }
+            .main-headline { font-size: 28px; }
+            .subheadline { font-size: 14px; }
+            .order-btn-container { width: 200px; height: 45px; }
+            .magic-btn { font-size: 14px; }
+            .service-item { font-size: 20px; }
+            .news-title { font-size: 24px; }
+            .news-text { font-size: 14px; }
+            .frame-text { font-size: 16px; }
+            .frame-btn { padding: 10px 20px; min-width: 180px; font-size: 14px; }
+            .phone-primary, .phone-secondary { font-size: 24px; }
+            .label-primary, .label-secondary { font-size: 14px; }
+            .footer-nav-item { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor-glow" id="cursorGlow"></div>
+    <div class="cursor-halo" id="cursorHalo"></div>
+    
+    <div class="site-container">
+        <!-- ========== ШАПКА ========== -->
+        <div class="header">
+            <div class="logo-area" id="logoArea">
+                <img class="logo-img" src="Images/Logo.png" alt="Root & Rise Logo">
+            </div>
+            <div class="brand-name" id="brandName">Root & Rise</div>
+            <div class="search-wrapper" id="searchWrapper">
+                <div class="search-icon"></div>
+                <input type="text" class="search-input-field" placeholder="Поиск">
+            </div>
+            <div class="nav-links">
+                <a href="about.html" class="nav-link" id="navAbout">О нас</a>
+                <a href="services.html" class="nav-link" id="navServices">Услуги</a>
+                <button class="nav-link" id="navContacts">Контакты</button>
+            </div>
+        </div>
+
+        <!-- ========== HERO СЕКЦИЯ ========== -->
+        <div class="hero-section">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="main-headline" id="mainHeadline">ДИЗАЙН СРЕДЫ<br>И ОЗЕЛЕНЕНИЯ</div>
+                    <div class="subheadline" id="subHeadline">Ваш личный оазис, созданный по законам красоты и гармонии</div>
+                    <div class="order-btn-container" id="heroBtnContainer">
+                        <div class="order-btn-wrapper">
+                            <button class="magic-btn" id="orderButton">Заказать</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flower-image" id="flowerImage">
+                <img class="flower-img" src="Images/flower-img.png" alt="Декоративный цветок">
+            </div>
+        </div>
+
+        <!-- ========== СЕКЦИЯ УСЛУГ ========== -->
+        <div class="services-section">
+            <div class="white-line" id="whiteLine"></div>
+            <div class="services-list">
+                <button class="service-item" id="service1">Услуга 1</button>
+                <button class="service-item" id="service2">Услуга 2</button>
+                <button class="service-item" id="service3">Услуга 3</button>
+            </div>
+        </div>
+
+        <!-- ========== СЕКЦИЯ НОВОСТЕЙ ========== -->
+        <div class="news-section">
+            <div class="slanted-shape" id="slantedShape"></div>
+            <div class="tree-image" id="treeImage">
+                <img src="Images/tree-image.png" alt="Дерево">
+            </div>
+            <div class="news-content" id="newsContent">
+                <div class="news-title">Новости</div>
+                <div class="news-text">
+                    Команда студии ландшафтного дизайна «Root&Rise» с гордостью представляет завершенный масштабный проект - сквер «Зеленый Феникс». Этот объект - наглядный пример того, как современный дизайн среды и филигранная работа с озеленением могут кардинально преобразить городское пространство, вдохнув в него новую жизнь.
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== НИЖНИЙ ФРЕЙМ 1920x1080 ========== -->
+        <div class="fullscreen-frame">
+            <div class="frame-content">
+                <div class="frame-text" id="frameText">
+                    В каждом проекте мы стремимся к чистой эстетике, логике и смыслу, создавая дизайн, который не просто выглядит стильно, но и отражает ценности и характер нашей компании
+                </div>
+                <div class="buttons-wrapper">
+                    <div class="btn-with-branch" id="btnGroupOrder">
+                        <div class="branch-under-btn-v"><img src="Images/vetkaV.png" alt="Ветка V"></div>
+                        <button class="frame-btn" id="frameOrderBtn">ЗАКАЗАТЬ</button>
+                    </div>
+                    <div class="btn-with-branch" id="btnGroupReviews">
+                        <div class="branch-under-btn-n"><img src="Images/vetkaN.png" alt="Ветка N"></div>
+                        <button class="frame-btn" id="frameReviewsBtn">ОТЗЫВЫ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== ПОДВАЛ ========== -->
+        <div class="footer" id="footer">
+            <div class="footer__contacts">
+                <div class="phone-primary">8(800) 808-00-08</div>
+                <div class="label-primary">контактный центр</div>
+                <div class="phone-secondary">+7(767) 465-57-93</div>
+                <div class="label-secondary">отдел заботы о пользователях</div>
+                <div class="social-icons">
+                    <div class="social-icon"><span>VK</span></div>
+                    <div class="social-icon"><span>TG</span></div>
+                    <div class="social-icon"><span>WA</span></div>
+                </div>
+            </div>
+            <div class="footer__nav">
+                <div class="nav-column">
+                    <button class="footer-nav-item">Продукт</button>
+                    <button class="footer-nav-item">Тарифы</button>
+                    <button class="footer-nav-item">Приложения</button>
+                    <button class="footer-nav-item">Обновления</button>
+                </div>
+                <div class="nav-column">
+                    <button class="footer-nav-item">О компании</button>
+                    <button class="footer-nav-item">Документы</button>
+                    <button class="footer-nav-item">Блог</button>
+                    <button class="footer-nav-item">Вакансии</button>
+                    <button class="footer-nav-item">Контакты</button>
+                </div>
+            </div>
+            <div class="footer__bottom">
+                <div class="white-line-footer"></div>
+                <div class="footer__legal">
+                    <div class="copyright">Root & Rise, 2025-2026</div>
+                    <div class="legal-links">
+                        <button class="legal-item">Оплата</button>
+                        <button class="legal-item">Правила платформы</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- КНОПКА ЛИЧНОГО КАБИНЕТА -->
+        <a href="personaL.html" class="account-button" id="accountBtn">
+            <div class="account-icon-svg"></div>
+            <div class="account-label">Личный кабинет</div>
+        </a>
+    </div>
+
+    <script>
+        (function() {
+            // Проверка на touch-устройство: отключаем мышиный след
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const cursorGlow = document.getElementById('cursorGlow');
+            const cursorHalo = document.getElementById('cursorHalo');
+            if (isTouchDevice) {
+                if(cursorGlow) cursorGlow.style.display = 'none';
+                if(cursorHalo) cursorHalo.style.display = 'none';
+            } else {
+                let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0, haloX = 0, haloY = 0;
+                document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+                function animateCursor() {
+                    glowX += (mouseX - glowX) * 0.12;
+                    glowY += (mouseY - glowY) * 0.12;
+                    haloX += (mouseX - haloX) * 0.08;
+                    haloY += (mouseY - haloY) * 0.08;
+                    cursorGlow.style.left = glowX + 'px';
+                    cursorGlow.style.top = glowY + 'px';
+                    cursorHalo.style.left = haloX + 'px';
+                    cursorHalo.style.top = haloY + 'px';
+                    requestAnimationFrame(animateCursor);
+                }
+                animateCursor();
+            }
+        })();
+        
+        function createSakuraPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('sakura-petal');
+            const size = 6 + Math.random() * 8;
+            petal.style.width = size + 'px';
+            petal.style.height = size + 'px';
+            const r = 255, g = 180 + Math.random() * 55, b = 190 + Math.random() * 50;
+            const alpha = 0.2 + Math.random() * 0.25;
+            petal.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            if (Math.random() > 0.5) petal.style.borderRadius = '50% 0 50% 0';
+            else petal.style.borderRadius = '0 50% 0 50%';
+            const startX = Math.random() * window.innerWidth;
+            petal.style.left = startX + 'px';
+            petal.style.top = '-20px';
+            const duration = 12 + Math.random() * 15;
+            petal.style.animation = `sakuraFall ${duration}s linear forwards`;
+            const sway = (Math.random() - 0.5) * 80;
+            petal.style.setProperty('--sway', sway + 'px');
+            const delay = Math.random() * 8;
+            petal.style.animationDelay = delay + 's';
+            document.body.appendChild(petal);
+            setTimeout(() => { if(petal && petal.parentNode) petal.remove(); }, (duration + delay) * 1000);
+        }
+        let sakuraInterval;
+        function startSakura() {
+            for (let i = 0; i < 20; i++) setTimeout(() => createSakuraPetal(), i * 200);
+            sakuraInterval = setInterval(() => { for(let i=0;i<2;i++) createSakuraPetal(); }, 1300);
+        }
+        window.addEventListener('load', startSakura);
+        window.addEventListener('beforeunload', () => clearInterval(sakuraInterval));
+        
+        function createRipple(event, element) {
+            const rect = element.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height) * 1.3;
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple-effect');
+            let clientX = event.clientX, clientY = event.clientY;
+            // Если на тач-устройстве и нет координат мыши, используем центр элемента
+            if (!clientX || !clientY) { clientX = rect.left + rect.width / 2; clientY = rect.top + rect.height / 2; }
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            ripple.style.width = ripple.style.height = `${size}px`;
+            ripple.style.left = `${x - size/2}px`;
+            ripple.style.top = `${y - size/2}px`;
+            ripple.style.position = 'absolute';
+            element.style.position = 'relative';
+            element.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 650);
+        }
+        
+        function burstPetals(centerX, centerY, count = 22) {
+            for (let i = 0; i < count; i++) {
+                const angle = (i / count) * Math.PI * 2 + Math.random() * 0.7;
+                const petal = document.createElement('div');
+                petal.classList.add('petal-burst');
+                petal.innerHTML = '🌸';
+                petal.style.fontSize = `${14 + Math.random() * 14}px`;
+                petal.style.position = 'fixed';
+                petal.style.left = `${centerX + (Math.random() - 0.5) * 45}px`;
+                petal.style.top = `${centerY + (Math.random() - 0.5) * 40}px`;
+                const dx3 = Math.cos(angle) * (70 + Math.random() * 60);
+                const dy3 = Math.sin(angle) * (60 + Math.random() * 70) - 40;
+                petal.style.setProperty('--dx3', `${dx3}px`);
+                petal.style.setProperty('--dy3', `${dy3}px`);
+                petal.style.setProperty('--rot3', `${(Math.random() - 0.5) * 80 + 45}deg`);
+                document.body.appendChild(petal);
+                setTimeout(() => petal.remove(), 1300);
+            }
+        }
+        
+        // Универсальный обработчик для кликов и тапов с получением координат
+        function handleInteraction(e, btn, callback) {
+            e.stopPropagation();
+            e.preventDefault();  // предотвращаем случайный скролл или выделение
+            let clientX, clientY;
+            if (e.touches) {
+                // touchstart/touchend event
+                const touch = e.touches ? e.touches[0] : (e.changedTouches ? e.changedTouches[0] : null);
+                if (touch) {
+                    clientX = touch.clientX;
+                    clientY = touch.clientY;
+                } else {
+                    const rect = btn.getBoundingClientRect();
+                    clientX = rect.left + rect.width / 2;
+                    clientY = rect.top + rect.height / 2;
+                }
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+                if (!clientX || !clientY) {
+                    const rect = btn.getBoundingClientRect();
+                    clientX = rect.left + rect.width / 2;
+                    clientY = rect.top + rect.height / 2;
+                }
+            }
+            createRipple({ clientX, clientY }, btn);
+            burstPetals(clientX, clientY, 24);
+            if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(40);
+            btn.style.transform = 'scale(0.96)';
+            setTimeout(() => { btn.style.transform = ''; }, 180);
+            const flashOverlay = document.createElement('div');
+            flashOverlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(211,97,177,0.25); pointer-events:none; z-index:9998; animation:flashFade 0.4s ease-out forwards;';
+            document.body.appendChild(flashOverlay);
+            setTimeout(() => flashOverlay.remove(), 400);
+            if (callback) callback(e);
+        }
+        
+        function addButtonEffects(btn) {
+            if (!btn) return;
+            // удаляем старые слушатели, чтобы избежать дублей (клонирование может оставить, но для надежности)
+            const newBtn = btn.cloneNode(true);
+            if (btn.parentNode) btn.parentNode.replaceChild(newBtn, btn);
+            const finalBtn = newBtn;
+            
+            const handleStart = (e) => {
+                // для ссылок (a) нужно предотвратить переход пока не сделаем эффекты, но потом перенаправим
+                let isLink = finalBtn.tagName === 'A';
+                handleInteraction(e, finalBtn, (ev) => {
+                    if (isLink) {
+                        const href = finalBtn.getAttribute('href');
+                        if (href && href !== '#') {
+                            setTimeout(() => { window.location.href = href; }, 100);
+                        }
+                    }
+                });
+                // если не ссылка - просто эффекты, остальное в колбэке
+                if (!isLink) {
+                    // для кнопок с дополнительными действиями, например "Заказать" или "Отзывы", отрабатываем отдельные коллбэки позже
+                }
+            };
+            finalBtn.addEventListener('mousedown', handleStart);
+            finalBtn.addEventListener('touchstart', handleStart, { passive: false });
+            return finalBtn;
+        }
+        
+        // Перенаправление на персоналку или отзывы с эффектом
+        function redirectToPersonal(event, btnElement) {
+            window.location.href = 'personaL.html';
+        }
+        
+        function redirectToReviews(event, btnElement) {
+            window.location.href = 'reviews.html';
+        }
+        
+        // Обработка специальных кнопок
+        const orderButton = document.getElementById('orderButton');
+        const frameOrderBtn = document.getElementById('frameOrderBtn');
+        const reviewsBtn = document.getElementById('frameReviewsBtn');
+        
+        function setupSpecialButton(btn, redirectFn) {
+            if (!btn) return;
+            const enhanced = addButtonEffects(btn);
+            if (enhanced) {
+                enhanced.addEventListener('mousedown', (e) => {
+                    handleInteraction(e, enhanced, () => { setTimeout(() => redirectFn(e, enhanced), 80); });
+                });
+                enhanced.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    handleInteraction(e, enhanced, () => { setTimeout(() => redirectFn(e, enhanced), 80); });
+                }, { passive: false });
+            }
+        }
+        
+        setupSpecialButton(orderButton, redirectToPersonal);
+        setupSpecialButton(frameOrderBtn, redirectToPersonal);
+        setupSpecialButton(reviewsBtn, redirectToReviews);
+        
+        // Контакты: прокрутка к футеру
+        const contactsNav = document.getElementById('navContacts');
+        const footerElem = document.getElementById('footer');
+        if (contactsNav && footerElem) {
+            const enhancedContact = addButtonEffects(contactsNav);
+            if (enhancedContact) {
+                enhancedContact.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    footerElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+                enhancedContact.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    footerElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
+        }
+        
+        // Обработка всех остальных кликабельных элементов (навигация, услуги, футер и т.д.)
+        const otherSelectors = ['.nav-link', '.service-item', '.footer-nav-item', '.legal-item', '.social-icon', '.account-button'];
+        otherSelectors.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+                if (el.id !== 'navContacts' && el.id !== 'orderButton' && el.id !== 'frameOrderBtn' && el.id !== 'frameReviewsBtn') {
+                    const enhanced = addButtonEffects(el);
+                    if (enhanced && (enhanced.tagName === 'A' || enhanced.getAttribute('href'))) {
+                        // для ссылок оставляем навигацию через стандартный переход после эффекта
+                        enhanced.addEventListener('mousedown', (e) => { /* handled by addButtonEffects already */ });
+                        enhanced.addEventListener('touchstart', (e) => { e.preventDefault(); }, { passive: false });
+                    }
+                }
+            });
+        });
+        
+        // Дополнительно: кнопка "Личный кабинет" - должна вести на personaL.html
+        const accountLink = document.getElementById('accountBtn');
+        if (accountLink) {
+            const enhancedAccount = addButtonEffects(accountLink);
+            if (enhancedAccount) {
+                enhancedAccount.addEventListener('mousedown', (e) => {
+                    handleInteraction(e, enhancedAccount, () => { setTimeout(() => { window.location.href = 'personaL.html'; }, 80); });
+                });
+                enhancedAccount.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    handleInteraction(e, enhancedAccount, () => { setTimeout(() => { window.location.href = 'personaL.html'; }, 80); });
+                }, { passive: false });
+            }
+        }
+        
+        // Intersection Observer для анимаций
+        const observerOptions = { threshold: 0.2, rootMargin: "0px 0px -50px 0px" };
+        const observerCallback = (entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+                else entry.target.classList.remove('visible');
+            });
+        };
+        const observer = new IntersectionObserver(observerCallback, observerOptions);
+        const elements = ['logoArea', 'brandName', 'searchWrapper', 'navAbout', 'navServices', 'navContacts', 'mainHeadline', 'subHeadline', 'heroBtnContainer', 'flowerImage', 'whiteLine', 'service1', 'service2', 'service3', 'slantedShape', 'treeImage', 'newsContent', 'frameText', 'btnGroupOrder', 'btnGroupReviews'];
+        elements.forEach(id => { const el = document.getElementById(id); if(el) observer.observe(el); });
+        setTimeout(() => {
+            elements.forEach(id => { const el = document.getElementById(id); if(el && el.getBoundingClientRect().top < window.innerHeight) el.classList.add('visible'); });
+        }, 100);
+        
+        const styleFlash = document.createElement('style');
+        styleFlash.textContent = `@keyframes flashFade { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }`;
+        document.head.appendChild(styleFlash);
+    </script>
+</body>
+</html>

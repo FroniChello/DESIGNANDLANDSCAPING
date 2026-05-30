@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Услуги | Root & Rise — Дизайн среды и озеленения</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #000000;
+            overflow-x: hidden;
+            cursor: default;
+        }
+
+        .site-container {
+            max-width: 1920px;
+            margin: 0 auto;
+            background: #000000;
+            position: relative;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* ========== КРУЖОК ЗА КУРСОРОМ (только десктоп) ========== */
+        .cursor-glow {
+            position: fixed;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(211, 97, 177, 0.12) 0%, rgba(211, 97, 177, 0.04) 40%, rgba(211, 97, 177, 0) 70%);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            filter: blur(18px);
+            will-change: left, top;
+        }
+        
+        .cursor-halo {
+            position: fixed;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 180, 200, 0.05) 0%, rgba(211, 97, 177, 0.02) 50%, transparent 80%);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 998;
+            filter: blur(28px);
+            will-change: left, top;
+        }
+
+        @media (max-width: 768px) {
+            .cursor-glow, .cursor-halo { display: none; }
+        }
+
+        /* ========== ПАДАЮЩИЕ ЛЕПЕСТКИ САКУРЫ ========== */
+        .sakura-petal {
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 180, 200, 0.5);
+            border-radius: 50% 0 50% 0;
+            opacity: 0;
+            filter: blur(0.8px);
+            will-change: transform;
+        }
+        
+        @media (min-width: 768px) {
+            .sakura-petal { width: 10px; height: 10px; }
+        }
+        
+        @keyframes sakuraFall {
+            0% { transform: translateY(-10vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.35; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(110vh) translateX(var(--sway, 30px)); opacity: 0; }
+        }
+
+        /* ========== АНИМАЦИИ ПОЯВЛЕНИЯ ПРИ СКРОЛЛЕ ========== */
+        .scroll-reveal {
+            opacity: 0;
+            transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            will-change: transform, opacity;
+        }
+        .reveal-fade-up { transform: translateY(50px); }
+        .reveal-fade-left { transform: translateX(-50px); }
+        .reveal-fade-right { transform: translateX(50px); }
+        .reveal-scale { transform: scale(0.95); }
+        .scroll-reveal.revealed {
+            opacity: 1 !important;
+            transform: translateX(0) translateY(0) scale(1) !important;
+        }
+
+        /* ========== ВЕРХНЯЯ НАВИГАЦИЯ ========== */
+        .header {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 37px 5% 20px 5%;
+            background-color: #000000;
+            z-index: 100;
+        }
+
+        .logo-area {
+            width: clamp(70px, 7.2vw, 138px);
+            height: clamp(70px, 7.2vw, 138px);
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .logo-area:active { transform: scale(0.96); }
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            border-radius: 8px;
+        }
+
+        .brand-name {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 500;
+            font-size: clamp(18px, 1.8vw, 22px);
+            color: #FFFFFF;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(20px, 4vw, 60px);
+            flex-shrink: 0;
+        }
+
+        .nav-link {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 800;
+            font-size: clamp(18px, 1.8vw, 28px);
+            color: #FFFFFF;
+            text-decoration: none;
+            position: relative;
+            white-space: nowrap;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+        }
+        
+        .nav-link::after { display: none; }
+        .nav-link:active {
+            transform: scale(0.96);
+            color: #FF3BA3;
+        }
+
+        /* ========== ДЕСКТОПНАЯ СЕКЦИЯ ========== */
+        .desktop-layout {
+            position: relative;
+            width: 100%;
+            background-color: #000000;
+            padding: 80px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .project-btn {
+            width: 354px;
+            height: 72px;
+            background-color: #FF3BA3;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            border: none;
+            box-shadow: 0 4px 15px rgba(255, 59, 163, 0.3);
+            flex-shrink: 0;
+        }
+        .project-btn:active {
+            transform: scale(0.97);
+            background-color: #e63292;
+        }
+        .project-btn span {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            color: white;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 220px);
+            gap: 30px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .photo-card {
+            width: 220px;
+            height: 220px;
+            overflow: hidden;
+            background-color: #1a1a1a;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: box-shadow 0.2s, transform 0.2s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        .photo-card:active {
+            transform: scale(0.97);
+        }
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        /* ========== АДАПТАЦИЯ ДЛЯ ПЛАНШЕТОВ ========== */
+        @media (max-width: 1100px) and (min-width: 769px) {
+            .desktop-layout {
+                flex-direction: column;
+                text-align: center;
+                padding: 60px 5%;
+                gap: 50px;
+            }
+            .project-btn { width: 320px; height: 70px; margin: 0 auto; }
+            .project-btn span { font-size: 18px; }
+            .photos-grid { 
+                grid-template-columns: repeat(2, 200px); 
+                gap: 25px;
+                margin: 0 auto;
+            }
+            .photo-card { width: 200px; height: 200px; }
+        }
+
+        /* ========== АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ (НЕТ ВЫЛЕЗАНИЙ) ========== */
+        @media (max-width: 768px) {
+            .desktop-layout {
+                flex-direction: column;
+                text-align: center;
+                padding: 40px 16px;
+                gap: 35px;
+            }
+            
+            .project-btn {
+                width: 280px;
+                height: 60px;
+                margin: 0 auto;
+                border-radius: 60px;
+            }
+            .project-btn span { font-size: 16px; }
+            
+            .photos-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(140px, 160px));
+                gap: 16px;
+                justify-content: center;
+                width: 100%;
+                max-width: 340px;
+                margin: 0 auto;
+            }
+            
+            .photo-card {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 1 / 1;
+            }
+            
+            .header {
+                padding: 20px 4% 15px 4%;
+                gap: 12px;
+            }
+            .nav-link { font-size: 14px; white-space: nowrap; }
+            .nav-links { gap: 15px; }
+            .brand-name { font-size: 16px; white-space: normal; }
+            .header { flex-wrap: wrap; gap: 12px; justify-content: center; }
+            .nav-links { margin-left: 0; width: 100%; justify-content: center; margin-top: 10px; }
+        }
+
+        @media (max-width: 480px) {
+            .photos-grid {
+                grid-template-columns: repeat(2, minmax(130px, 145px));
+                gap: 12px;
+                max-width: 300px;
+            }
+            .project-btn { width: 260px; height: 55px; }
+            .project-btn span { font-size: 14px; }
+        }
+
+        /* ========== ФРЕЙМ С ФОТОГРАФИЕЙ ========== */
+        .fullscreen-frame {
+            width: 100%;
+            position: relative;
+            background-color: #000000;
+            overflow: hidden;
+            min-height: 600px;
+        }
+
+        .frame-bg-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        .frame-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .other-services-title {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 800;
+            font-size: 36px;
+            color: #FFFFFF;
+            letter-spacing: 1px;
+            z-index: 3;
+            text-transform: uppercase;
+        }
+
+        .services-buttons-container {
+            position: absolute;
+            left: 10%;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            z-index: 3;
+        }
+
+        .service-btn {
+            width: 300px;
+            height: 65px;
+            background-color: #FF3BA3;
+            border-radius: 60px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: #FFFFFF;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            box-shadow: 0 4px 15px rgba(255, 59, 163, 0.3);
+            letter-spacing: 0.5px;
+        }
+        .service-btn:active {
+            transform: scale(0.97);
+            background-color: #e63292;
+        }
+
+        @media (max-width: 1200px) {
+            .services-buttons-container {
+                left: 5%;
+                gap: 30px;
+            }
+            .service-btn { width: 270px; height: 60px; font-size: 16px; }
+            .other-services-title { font-size: 32px; top: 40px; }
+        }
+
+        @media (max-width: 900px) {
+            .services-buttons-container {
+                left: 50%;
+                transform: translateX(-50%) translateY(-50%);
+                align-items: center;
+                top: 50%;
+            }
+            .other-services-title { font-size: 28px; top: 30px; }
+            .service-btn { width: 260px; height: 55px; font-size: 15px; }
+            .frame-bg-image { min-height: 500px; }
+        }
+
+        @media (max-width: 768px) {
+            .fullscreen-frame { min-height: auto; padding-bottom: 40px; }
+            .frame-bg-image { min-height: 400px; height: auto; }
+            .other-services-title { 
+                position: relative; 
+                top: 0; 
+                padding-top: 30px; 
+                padding-bottom: 10px;
+                font-size: 24px;
+            }
+            .services-buttons-container {
+                position: relative;
+                left: auto;
+                top: auto;
+                transform: none;
+                margin: 20px auto 40px;
+                gap: 20px;
+                align-items: center;
+                width: 100%;
+            }
+            .service-btn {
+                width: 260px;
+                height: 50px;
+                font-size: 14px;
+            }
+        }
+
+        /* ========== ПОДВАЛ ========== */
+        .footer {
+            width: 100%;
+            background: linear-gradient(to bottom, #000000, #FF3BA3);
+            position: relative;
+            color: white;
+            margin-top: 0;
+            padding: 60px 5% 40px;
+            min-height: auto;
+        }
+        
+        @media (min-width: 1100px) {
+            .footer { height: 1080px; padding: 0; }
+        }
+
+        .footer__contacts {
+            position: relative;
+            left: auto;
+            top: auto;
+            transform: none;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        @media (min-width: 1100px) {
+            .footer__contacts {
+                position: absolute;
+                left: 40px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 480px;
+                text-align: left;
+                margin-bottom: 0;
+            }
+        }
+
+        .phone-primary, .phone-secondary {
+            font-weight: 800;
+            font-size: clamp(28px, 7vw, 51px);
+            line-height: 1.1;
+            cursor: pointer;
+        }
+        .phone-primary:active, .phone-secondary:active { opacity: 0.7; }
+        .label-primary, .label-secondary {
+            font-weight: 800;
+            font-size: clamp(16px, 4vw, 24px);
+            margin-top: 5px;
+        }
+        .phone-secondary { margin-top: 20px; }
+        
+        .social-icons {
+            margin-top: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+        @media (min-width: 1100px) { .social-icons { justify-content: flex-start; gap: 45px; } }
+        
+        .social-icon {
+            width: clamp(40px, 10vw, 48px);
+            height: clamp(40px, 10vw, 48px);
+            background-color: rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 800;
+            font-size: clamp(12px, 3vw, 14px);
+            text-transform: uppercase;
+            backdrop-filter: blur(2px);
+            border: 1px dashed rgba(255,255,255,0.6);
+        }
+        .social-icon:active { transform: scale(0.95); background-color: rgba(211,97,177,0.6); }
+
+        .footer__nav {
+            position: relative;
+            right: auto;
+            top: auto;
+            transform: none;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        @media (min-width: 768px) and (max-width: 1099px) {
+            .footer__nav { flex-direction: row; justify-content: center; gap: 50px; }
+        }
+        
+        @media (min-width: 1100px) {
+            .footer__nav {
+                position: absolute;
+                right: 80px;
+                top: 50%;
+                transform: translateY(-50%);
+                flex-direction: row;
+                gap: 80px;
+                margin: 0;
+            }
+        }
+
+        .nav-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+        @media (min-width: 768px) { .nav-column { align-items: flex-start; } }
+
+        .nav-item {
+            font-weight: 400;
+            font-size: clamp(16px, 4vw, 24px);
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            background: none;
+            border: none;
+            font-family: 'Kanit', sans-serif;
+        }
+        .nav-item:active { opacity: 0.6; transform: scale(0.98); }
+
+        .footer__bottom {
+            position: relative;
+            bottom: auto;
+            left: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+        }
+        
+        @media (min-width: 1100px) {
+            .footer__bottom {
+                position: absolute;
+                bottom: 100px;
+                left: 0;
+                margin-top: 0;
+            }
+        }
+
+        .white-line-footer {
+            width: 90%;
+            max-width: 1472px;
+            height: 2px;
+            background-color: white;
+            margin: 0 auto;
+        }
+
+        .footer__legal {
+            width: 90%;
+            max-width: 1472px;
+            margin: 10px auto 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        @media (min-width: 768px) { .footer__legal { flex-direction: row; justify-content: space-between; } }
+
+        .copyright {
+            font-weight: 400;
+            font-size: clamp(14px, 3.5vw, 24px);
+            color: white;
+            text-align: center;
+        }
+
+        .legal-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .legal-item {
+            font-weight: 400;
+            font-size: clamp(14px, 3.5vw, 24px);
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: 'Kanit', sans-serif;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+        }
+        .legal-item:active { opacity: 0.7; }
+        
+        @media (max-width: 500px) {
+            .legal-item { white-space: normal; font-size: 12px; }
+        }
+
+        /* Ripple эффект */
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.7) 0%, rgba(255, 59, 163, 0.5) 50%, transparent);
+            transform: scale(0);
+            animation: rippleAnim 0.7s forwards;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            0% { transform: scale(0); opacity: 0.8; }
+            100% { transform: scale(6); opacity: 0; }
+        }
+
+        .petal-burst {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+            animation: petalFloat 1.3s forwards;
+        }
+        @keyframes petalFloat {
+            0% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(0.5);}
+            100% { opacity: 0; transform: translate(var(--dx3, 85px), var(--dy3, -130px)) rotate(var(--rot3, 55deg)) scale(0.5);}
+        }
+
+        @keyframes flashFade {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor-glow" id="cursorGlow"></div>
+    <div class="cursor-halo" id="cursorHalo"></div>
+
+    <div class="site-container">
+        <!-- ========== ВЕРХНЯЯ НАВИГАЦИЯ ========== -->
+        <div class="header">
+            <div class="logo-area scroll-reveal reveal-fade-left" id="logoArea">
+                <img class="logo-img" src="Images/Logo.png" alt="Root & Rise Logo">
+            </div>
+            <div class="brand-name scroll-reveal reveal-fade-left">Root & Rise</div>
+            <div class="nav-links">
+                <button class="nav-link scroll-reveal reveal-fade-right" id="navHome">На главную</button>
+                <button class="nav-link scroll-reveal reveal-fade-right" id="navAbout">О нас</button>
+                <button class="nav-link scroll-reveal reveal-fade-right" id="navContacts">Контакты</button>
+            </div>
+        </div>
+
+        <!-- ========== СЕКЦИЯ: КНОПКА СЛЕВА, СЕТКА 2×2 СПРАВА ========== -->
+        <div class="desktop-layout">
+            <button class="project-btn scroll-reveal reveal-fade-left" id="projectBtn">
+                <span>Подробнее о проектировании</span>
+            </button>
+
+            <div class="photos-grid">
+                <div class="photo-card scroll-reveal reveal-scale" id="project1">
+                    <img src="Images/ProjectPhoto1.png" alt="Проект 1">
+                </div>
+                <div class="photo-card scroll-reveal reveal-scale" id="project2">
+                    <img src="Images/ProjectPhoto2.png" alt="Проект 2">
+                </div>
+                <div class="photo-card scroll-reveal reveal-scale" id="project3">
+                    <img src="Images/ProjectPhoto3.png" alt="Проект 3">
+                </div>
+                <div class="photo-card scroll-reveal reveal-scale" id="project4">
+                    <img src="Images/ProjectPhoto4.png" alt="Проект 4">
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== ФРЕЙМ С ФОТОГРАФИЕЙ ========== -->
+        <div class="fullscreen-frame">
+            <img class="frame-bg-image" src="Images/FlowerFon.png" alt="Фоновое изображение фрейма">
+            <div class="frame-overlay"></div>
+            
+            <div class="other-services-title scroll-reveal reveal-fade-up">ДРУГИЕ УСЛУГИ</div>
+            
+            <div class="services-buttons-container">
+                <button class="service-btn scroll-reveal reveal-fade-left" id="servicePhytodesign">Фитодизайн интерьера</button>
+                <button class="service-btn scroll-reveal reveal-fade-left" id="serviceVertical">Вертикальное озеленение</button>
+                <button class="service-btn scroll-reveal reveal-fade-left" id="serviceLighting">Освещение</button>
+            </div>
+        </div>
+
+        <!-- ========== ПОДВАЛ ========== -->
+        <div class="footer" id="footer">
+            <div class="footer__contacts">
+                <div class="phone-primary scroll-reveal reveal-fade-left" id="phonePrimary">8(800) 808-00-08</div>
+                <div class="label-primary scroll-reveal reveal-fade-left">контактный центр</div>
+                <div class="phone-secondary scroll-reveal reveal-fade-left" id="phoneSecondary">+7(767) 465-57-93</div>
+                <div class="label-secondary scroll-reveal reveal-fade-left">отдел заботы о пользователях</div>
+                <div class="social-icons">
+                    <div class="social-icon scroll-reveal reveal-scale" data-social="vk">VK</div>
+                    <div class="social-icon scroll-reveal reveal-scale" data-social="tg">TG</div>
+                    <div class="social-icon scroll-reveal reveal-scale" data-social="wa">WA</div>
+                </div>
+            </div>
+
+            <div class="footer__nav">
+                <div class="nav-column">
+                    <button class="nav-item scroll-reveal reveal-fade-right" data-nav="product">Продукт</button>
+                    <button class="nav-item scroll-reveal reveal-fade-right" data-nav="tariffs">Тарифы</button>
+                    <button class="nav-item scroll-reveal reveal-fade-right" data-nav="apps">Приложения</button>
+                    <button class="nav-item scroll-reveal reveal-fade-right" data-nav="updates">Обновления</button>
+                </div>
+                <div class="nav-column">
+                    <button class="nav-item scroll-reveal reveal-fade-right" data-nav="about">О компании</button>
+                    <button class="nav-item scroll-reveal reveal-fade-right" data-nav="docs">Документы</button>
+                    <button class="nav-item scroll-reveal reveal-fade-right" data-nav="blog">Блог</button>
+                    <button class="nav-item scroll-reveal reveal-fade-right" data-nav="jobs">Вакансии</button>
+                    <button class="nav-item scroll-reveal reveal-fade-right" data-nav="contacts">Контакты</button>
+                </div>
+            </div>
+
+            <div class="footer__bottom">
+                <div class="white-line-footer scroll-reveal reveal-scale"></div>
+                <div class="footer__legal">
+                    <div class="copyright scroll-reveal reveal-fade-up">Root & Rise, 2025-2026</div>
+                    <div class="legal-links">
+                        <button class="legal-item scroll-reveal reveal-fade-right" data-legal="payment">Оплата</button>
+                        <button class="legal-item scroll-reveal reveal-fade-right" data-legal="rules">Правила платформы</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== КУРСОР (только десктоп) ==========
+        if (window.innerWidth > 768) {
+            (function() {
+                const cursorGlow = document.getElementById('cursorGlow');
+                const cursorHalo = document.getElementById('cursorHalo');
+                let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0, haloX = 0, haloY = 0;
+                document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+                function animateCursor() {
+                    glowX += (mouseX - glowX) * 0.12;
+                    glowY += (mouseY - glowY) * 0.12;
+                    haloX += (mouseX - haloX) * 0.08;
+                    haloY += (mouseY - haloY) * 0.08;
+                    cursorGlow.style.left = glowX + 'px';
+                    cursorGlow.style.top = glowY + 'px';
+                    cursorHalo.style.left = haloX + 'px';
+                    cursorHalo.style.top = haloY + 'px';
+                    requestAnimationFrame(animateCursor);
+                }
+                animateCursor();
+            })();
+        }
+
+        // ========== ПАДАЮЩИЕ ЛЕПЕСТКИ ==========
+        function createSakuraPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('sakura-petal');
+            const size = window.innerWidth < 768 ? 4 + Math.random() * 6 : 6 + Math.random() * 8;
+            petal.style.width = size + 'px';
+            petal.style.height = size + 'px';
+            const r = 255, g = 180 + Math.random() * 55, b = 190 + Math.random() * 50;
+            const alpha = 0.2 + Math.random() * 0.25;
+            petal.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            petal.style.borderRadius = Math.random() > 0.5 ? '50% 0 50% 0' : '0 50% 0 50%';
+            petal.style.left = Math.random() * window.innerWidth + 'px';
+            petal.style.top = '-20px';
+            const duration = 12 + Math.random() * 15;
+            petal.style.animation = `sakuraFall ${duration}s linear forwards`;
+            petal.style.setProperty('--sway', (Math.random() - 0.5) * (window.innerWidth < 768 ? 50 : 80) + 'px');
+            petal.style.animationDelay = Math.random() * 8 + 's';
+            document.body.appendChild(petal);
+            setTimeout(() => petal.remove(), (duration + 8) * 1000);
+        }
+
+        let sakuraInterval;
+        function startSakuraFall() {
+            const initialCount = window.innerWidth < 768 ? 10 : 20;
+            for (let i = 0; i < initialCount; i++) setTimeout(() => createSakuraPetal(), i * 200);
+            sakuraInterval = setInterval(() => {
+                const count = window.innerWidth < 768 ? 1 : 2;
+                for (let i = 0; i < count; i++) createSakuraPetal();
+            }, window.innerWidth < 768 ? 2000 : 1300);
+        }
+        window.addEventListener('load', startSakuraFall);
+        window.addEventListener('beforeunload', () => clearInterval(sakuraInterval));
+
+        // ========== RIPPLE ЭФФЕКТЫ ==========
+        function createRipple(event, element) {
+            const rect = element.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height) * 1.3;
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple-effect');
+            let clientX = event.clientX, clientY = event.clientY;
+            if (!clientX || !clientY) { 
+                clientX = rect.left + rect.width / 2; 
+                clientY = rect.top + rect.height / 2; 
+            }
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            ripple.style.width = ripple.style.height = `${size}px`;
+            ripple.style.left = `${x - size/2}px`;
+            ripple.style.top = `${y - size/2}px`;
+            ripple.style.position = 'absolute';
+            element.style.position = 'relative';
+            element.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 650);
+        }
+
+        function burstPetals(x, y) {
+            const count = window.innerWidth < 768 ? 12 : 22;
+            for (let i = 0; i < count; i++) {
+                const petal = document.createElement('div');
+                petal.classList.add('petal-burst');
+                const flowers = ['🌸', '🌸', '🌺', '🌸', '🌸', '🌸'];
+                petal.innerHTML = flowers[Math.floor(Math.random() * flowers.length)];
+                petal.style.fontSize = `${(window.innerWidth < 768 ? 10 : 12) + Math.random() * (window.innerWidth < 768 ? 10 : 16)}px`;
+                petal.style.position = 'fixed';
+                petal.style.left = `${x + (Math.random() - 0.5) * (window.innerWidth < 768 ? 40 : 55)}px`;
+                petal.style.top = `${y + (Math.random() - 0.5) * (window.innerWidth < 768 ? 40 : 55)}px`;
+                const dx3 = (Math.random() - 0.5) * (window.innerWidth < 768 ? 90 : 130);
+                const dy3 = -70 - Math.random() * (window.innerWidth < 768 ? 70 : 100);
+                const rot3 = (Math.random() - 0.5) * 120;
+                petal.style.setProperty('--dx3', `${dx3}px`);
+                petal.style.setProperty('--dy3', `${dy3}px`);
+                petal.style.setProperty('--rot3', `${rot3}deg`);
+                document.body.appendChild(petal);
+                setTimeout(() => petal.remove(), 1400);
+            }
+        }
+
+        // Универсальная функция для обработки нажатий с переходом
+        function makeClickableWithRedirect(element, targetUrl) {
+            if (!element) return;
+            const handler = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                let clientX = e.clientX, clientY = e.clientY;
+                if (e.touches) {
+                    const touch = e.touches[0] || (e.changedTouches ? e.changedTouches[0] : null);
+                    if (touch) { clientX = touch.clientX; clientY = touch.clientY; }
+                }
+                createRipple({ clientX, clientY }, element);
+                burstPetals(clientX || element.getBoundingClientRect().left + element.offsetWidth/2, clientY || element.getBoundingClientRect().top + element.offsetHeight/2);
+                if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(35);
+                element.style.transform = 'scale(0.96)';
+                setTimeout(() => { if(element) element.style.transform = ''; }, 160);
+                const flash = document.createElement('div');
+                flash.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,59,163,0.25); pointer-events:none; z-index:9998; animation:flashFade 0.4s ease-out forwards;';
+                document.body.appendChild(flash);
+                setTimeout(() => flash.remove(), 400);
+                setTimeout(() => { window.location.href = targetUrl; }, 100);
+            };
+            element.addEventListener('mousedown', handler);
+            element.addEventListener('touchstart', handler, { passive: false });
+        }
+
+        // Навигация
+        makeClickableWithRedirect(document.getElementById('logoArea'), 'index.html');
+        makeClickableWithRedirect(document.getElementById('navHome'), 'index.html');
+        makeClickableWithRedirect(document.getElementById('navAbout'), 'about.html');
+        
+        // Контакты - скролл к подвалу
+        const navContacts = document.getElementById('navContacts');
+        const footerElem = document.getElementById('footer');
+        if (navContacts && footerElem) {
+            navContacts.addEventListener('click', () => footerElem.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+            navContacts.addEventListener('touchstart', (e) => { e.preventDefault(); footerElem.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+        }
+        
+        // Кнопка проектирования
+        makeClickableWithRedirect(document.getElementById('projectBtn'), 'design-details.html');
+        
+        // Карточки проектов
+        makeClickableWithRedirect(document.getElementById('project1'), 'project1.html');
+        makeClickableWithRedirect(document.getElementById('project2'), 'project2.html');
+        makeClickableWithRedirect(document.getElementById('project3'), 'project3.html');
+        makeClickableWithRedirect(document.getElementById('project4'), 'project4.html');
+        
+        // Кнопки услуг
+        makeClickableWithRedirect(document.getElementById('servicePhytodesign'), 'fitodizayn.html');
+        makeClickableWithRedirect(document.getElementById('serviceVertical'), 'vertical.html');
+        makeClickableWithRedirect(document.getElementById('serviceLighting'), 'lighting.html');
+        
+        // Телефоны
+        const phonePrimary = document.getElementById('phonePrimary');
+        const phoneSecondary = document.getElementById('phoneSecondary');
+        if (phonePrimary) {
+            phonePrimary.addEventListener('click', () => window.location.href = 'tel:88008080008');
+            phonePrimary.addEventListener('touchstart', (e) => { e.preventDefault(); window.location.href = 'tel:88008080008'; });
+        }
+        if (phoneSecondary) {
+            phoneSecondary.addEventListener('click', () => window.location.href = 'tel:+77674655793');
+            phoneSecondary.addEventListener('touchstart', (e) => { e.preventDefault(); window.location.href = 'tel:+77674655793'; });
+        }
+        
+        // Соцсети
+        const socialVk = document.querySelector('[data-social="vk"]');
+        const socialTg = document.querySelector('[data-social="tg"]');
+        const socialWa = document.querySelector('[data-social="wa"]');
+        if (socialVk) socialVk.addEventListener('click', () => window.open('https://vk.com', '_blank'));
+        if (socialTg) socialTg.addEventListener('click', () => window.open('https://t.me', '_blank'));
+        if (socialWa) socialWa.addEventListener('click', () => window.open('https://wa.me', '_blank'));
+        
+        // Footer навигация и правовые ссылки
+        const footerNavMap = {
+            'product': 'product.html',
+            'tariffs': 'tariffs.html',
+            'apps': 'apps.html',
+            'updates': 'updates.html',
+            'about': 'about.html',
+            'docs': 'documents.html',
+            'blog': 'blog.html',
+            'jobs': 'vacancies.html',
+            'contacts': 'contacts.html'
+        };
+        const legalMap = {
+            'payment': 'payment.html',
+            'rules': 'rules.html'
+        };
+        
+        document.querySelectorAll('.nav-item, .legal-item').forEach(btn => {
+            const navType = btn.getAttribute('data-nav');
+            const legalType = btn.getAttribute('data-legal');
+            if (navType && footerNavMap[navType]) {
+                makeClickableWithRedirect(btn, footerNavMap[navType]);
+            } else if (legalType && legalMap[legalType]) {
+                makeClickableWithRedirect(btn, legalMap[legalType]);
+            } else {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    createRipple(e, btn);
+                    burstPetals(e.clientX || btn.getBoundingClientRect().left + btn.offsetWidth/2, e.clientY || btn.getBoundingClientRect().top + btn.offsetHeight/2);
+                    btn.style.transform = 'scale(0.97)';
+                    setTimeout(() => { if(btn) btn.style.transform = ''; }, 150);
+                });
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    createRipple({ clientX: touch.clientX, clientY: touch.clientY }, btn);
+                    burstPetals(touch.clientX, touch.clientY);
+                    btn.style.transform = 'scale(0.97)';
+                    setTimeout(() => { if(btn) btn.style.transform = ''; }, 150);
+                }, { passive: false });
+            }
+        });
+        
+        // Анимация появления при скролле
+        const observerOptions = { threshold: 0.2, rootMargin: "0px 0px -50px 0px" };
+        const handleIntersect = (entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('revealed');
+                else entry.target.classList.remove('revealed');
+            });
+        };
+        const scrollObserver = new IntersectionObserver(handleIntersect, observerOptions);
+        const revealElements = document.querySelectorAll('.scroll-reveal');
+        revealElements.forEach(el => scrollObserver.observe(el));
+        
+        window.addEventListener('load', () => {
+            revealElements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 100) el.classList.add('revealed');
+            });
+        });
+    </script>
+</body>
+</html>

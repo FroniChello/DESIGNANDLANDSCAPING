@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Вертикальное озеленение — Root & Rise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #000000;
+            font-family: 'Kanit', 'Segoe UI', 'Poppins', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            color: #fff;
+            cursor: default;
+        }
+
+        .cursor-glow, .cursor-halo {
+            display: none;
+        }
+        
+        @media (min-width: 769px) {
+            .cursor-glow {
+                display: block;
+                position: fixed;
+                width: 180px;
+                height: 180px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(86, 188, 127, 0.12) 0%, rgba(86, 188, 127, 0.04) 40%, rgba(86, 188, 127, 0) 70%);
+                pointer-events: none;
+                transform: translate(-50%, -50%);
+                z-index: 999;
+                filter: blur(18px);
+                will-change: left, top;
+            }
+            .cursor-halo {
+                display: block;
+                position: fixed;
+                width: 280px;
+                height: 280px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(255, 180, 200, 0.05) 0%, rgba(86, 188, 127, 0.02) 50%, transparent 80%);
+                pointer-events: none;
+                transform: translate(-50%, -50%);
+                z-index: 998;
+                filter: blur(28px);
+                will-change: left, top;
+            }
+        }
+
+        .site-container {
+            width: 100%;
+            max-width: 1920px;
+            margin: 0 auto;
+            background-color: #000000;
+            position: relative;
+            z-index: 2;
+            padding: 0 4% 0 4%;
+        }
+
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 20px 0 15px 0;
+            background-color: #000000;
+            z-index: 10;
+            border-bottom: 1px solid rgba(86, 188, 127, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .logo-area {
+            width: clamp(45px, 12vw, 138px);
+            height: clamp(45px, 12vw, 138px);
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .logo-area:active { transform: scale(0.96); }
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .brand-name {
+            font-family: 'Kanit', sans-serif;
+            font-weight: 500;
+            font-size: clamp(14px, 4.5vw, 22px);
+            color: #FFFFFF;
+            white-space: nowrap;
+            cursor: pointer;
+            flex: 1;
+        }
+        .brand-name:active { opacity: 0.7; }
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(12px, 4vw, 60px);
+            justify-content: flex-end;
+        }
+        .nav-link {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 800;
+            font-size: clamp(14px, 3.5vw, 28px);
+            color: #FFFFFF;
+            text-decoration: none;
+            position: relative;
+            white-space: nowrap;
+            transition: opacity 0.3s;
+            padding: 5px 0;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            width: 0%;
+            height: 2px;
+            background: #FF3BA3;
+            transition: width 0.4s;
+            transform: translateX(-50%);
+        }
+        .nav-link:active { transform: scale(0.97); }
+
+        .hero-section {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .hero-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .hero-content {
+            flex: 1;
+            width: 100%;
+            text-align: center;
+        }
+        .hero-title {
+            font-size: clamp(28px, 7vw, 64px);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #56BC7F, #FF3BA3);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .hero-subtitle {
+            font-size: clamp(14px, 4vw, 22px);
+            font-weight: 300;
+            margin-bottom: 20px;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+        .hero-image {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 24px;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(86,188,127,0.2), rgba(255,59,163,0.2));
+            padding: 15px;
+            margin: 0 auto;
+        }
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            display: block;
+        }
+        
+        @media (min-width: 769px) {
+            .hero-section {
+                flex-direction: row;
+                text-align: left;
+            }
+            .hero-content {
+                text-align: left;
+            }
+        }
+
+        .section-title {
+            font-size: clamp(24px, 6vw, 48px);
+            font-weight: 700;
+            margin: 40px 0 20px 0;
+            position: relative;
+            display: inline-block;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(90deg, #56BC7F, #FF3BA3);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        @media (min-width: 480px) and (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                gap: 40px;
+            }
+        }
+
+        .service-card {
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 24px;
+            padding: 22px 18px;
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            border: 1px solid rgba(86, 188, 127, 0.3);
+            opacity: 0;
+            transform: translateY(30px);
+            cursor: pointer;
+        }
+        .service-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .service-card:active {
+            transform: scale(0.98);
+            border-color: #FF3BA3;
+        }
+        .card-icon {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+        .card-title {
+            font-size: clamp(18px, 5vw, 26px);
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #56BC7F;
+        }
+        .card-text {
+            font-size: clamp(13px, 3.5vw, 16px);
+            line-height: 1.5;
+            font-weight: 300;
+            color: #e0e0e0;
+        }
+
+        .benefits-block {
+            background: linear-gradient(135deg, rgba(86,188,127,0.1), rgba(255,59,163,0.05));
+            border-radius: 32px;
+            padding: 30px 20px;
+            margin: 40px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            justify-content: space-around;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.6s ease;
+        }
+        .benefits-block.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        @media (min-width: 480px) {
+            .benefits-block {
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 40px 30px;
+            }
+        }
+        
+        .benefit-item {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+        .benefit-number {
+            font-size: clamp(32px, 8vw, 48px);
+            font-weight: 800;
+            background: linear-gradient(135deg, #56BC7F, #FF3BA3);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .benefit-text {
+            font-size: clamp(12px, 3.5vw, 18px);
+            margin-top: 8px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #FF3BA3;
+            border: none;
+            border-radius: 60px;
+            padding: 12px 24px;
+            font-family: 'Kanit', sans-serif;
+            font-weight: 600;
+            font-size: clamp(16px, 4vw, 20px);
+            color: white;
+            cursor: pointer;
+            margin: 30px 0;
+            transition: 0.25s ease;
+            box-shadow: 0 6px 14px rgba(255,59,163,0.3);
+            width: 90%;
+            max-width: 280px;
+        }
+        .back-button:active {
+            transform: scale(0.96);
+            background: #e03292;
+        }
+
+        .sakura-petal {
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 59, 163, 0.3);
+            border-radius: 50% 0 50% 0;
+            opacity: 0;
+            filter: blur(0.8px);
+            will-change: transform;
+        }
+        
+        @media (min-width: 768px) {
+            .sakura-petal {
+                width: 10px;
+                height: 10px;
+            }
+        }
+        
+        @keyframes sakuraFall {
+            0% { transform: translateY(-10vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.35; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(110vh) translateX(var(--sway, 30px)); opacity: 0; }
+        }
+
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,59,163,0.5) 50%, transparent);
+            transform: scale(0);
+            animation: rippleAnim 0.7s forwards;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            0% { transform: scale(0); opacity: 0.8; }
+            100% { transform: scale(6); opacity: 0; }
+        }
+        .petal-burst {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: petalFloat 1.3s forwards;
+        }
+        @keyframes petalFloat {
+            0% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(0.5);}
+            100% { opacity: 0; transform: translate(var(--dx3, 85px), var(--dy3, -130px)) rotate(var(--rot3, 55deg)) scale(0.5);}
+        }
+        @keyframes flashFade {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* ПОДВАЛ адаптивный */
+        .footer {
+            width: 100%;
+            background: linear-gradient(to bottom, #000000, #FF3BA3);
+            margin: 60px 0 0 0;
+            position: relative;
+            color: white;
+            padding: 40px 20px 60px 20px;
+            min-height: auto;
+        }
+        
+        @media (min-width: 1100px) {
+            .footer {
+                height: 1080px;
+                padding: 0;
+                min-height: 1080px;
+            }
+        }
+
+        .footer__contacts {
+            position: relative;
+            left: auto;
+            top: auto;
+            transform: none;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        @media (min-width: 1100px) {
+            .footer__contacts {
+                position: absolute;
+                left: 40px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 480px;
+                text-align: left;
+                margin-bottom: 0;
+            }
+        }
+
+        .phone-primary, .phone-secondary {
+            font-weight: 800;
+            font-size: clamp(28px, 7vw, 51px);
+            line-height: 1.2;
+            cursor: pointer;
+        }
+        .phone-primary:active, .phone-secondary:active { opacity: 0.7; }
+        .label-primary, .label-secondary {
+            font-weight: 800;
+            font-size: clamp(16px, 4vw, 24px);
+            margin-top: 5px;
+        }
+        .phone-secondary {
+            margin-top: 20px;
+        }
+
+        .social-icons {
+            margin-top: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+        @media (min-width: 1100px) {
+            .social-icons {
+                justify-content: flex-start;
+                gap: 45px;
+            }
+        }
+
+        .social-icon {
+            width: clamp(40px, 10vw, 48px);
+            height: clamp(40px, 10vw, 48px);
+            background-color: rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: clamp(12px, 3vw, 14px);
+            text-transform: uppercase;
+            backdrop-filter: blur(2px);
+            border: 1px dashed rgba(255,255,255,0.6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .social-icon:active {
+            transform: scale(0.95);
+            background-color: rgba(255, 59, 163, 0.5);
+        }
+
+        .footer__nav {
+            position: relative;
+            right: auto;
+            top: auto;
+            transform: none;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        @media (min-width: 768px) and (max-width: 1099px) {
+            .footer__nav {
+                flex-direction: row;
+                justify-content: center;
+                gap: 50px;
+            }
+        }
+        
+        @media (min-width: 1100px) {
+            .footer__nav {
+                position: absolute;
+                right: 80px;
+                top: 50%;
+                transform: translateY(-50%);
+                flex-direction: row;
+                gap: 80px;
+                margin: 0;
+            }
+        }
+
+        .nav-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+        @media (min-width: 768px) {
+            .nav-column {
+                align-items: flex-start;
+            }
+        }
+
+        .footer-nav-item {
+            font-weight: 400;
+            font-size: clamp(16px, 4vw, 24px);
+            color: white;
+            text-decoration: none;
+            line-height: 1.3;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            background: none;
+            border: none;
+            text-align: center;
+            font-family: 'Kanit', sans-serif;
+        }
+        .footer-nav-item:active { opacity: 0.6; transform: scale(0.98); }
+        @media (min-width: 768px) {
+            .footer-nav-item {
+                text-align: left;
+            }
+        }
+
+        .footer__bottom {
+            position: relative;
+            bottom: auto;
+            left: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+        }
+        
+        @media (min-width: 1100px) {
+            .footer__bottom {
+                position: absolute;
+                bottom: 100px;
+                left: 0;
+                margin-top: 0;
+            }
+        }
+
+        .white-line-footer {
+            width: 90%;
+            max-width: 1472px;
+            height: 2px;
+            background-color: white;
+            margin: 0 auto;
+        }
+
+        .footer__legal {
+            width: 90%;
+            max-width: 1472px;
+            margin: 10px auto 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            position: relative;
+        }
+        
+        @media (min-width: 768px) {
+            .footer__legal {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        .copyright {
+            font-weight: 400;
+            font-size: clamp(14px, 3.5vw, 24px);
+            color: white;
+            text-align: center;
+        }
+
+        .legal-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        @media (min-width: 768px) {
+            .legal-links {
+                position: relative;
+                right: auto;
+                transform: none;
+                margin-right: 0;
+            }
+        }
+
+        .legal-item {
+            font-weight: 400;
+            font-size: clamp(14px, 3.5vw, 24px);
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: 'Kanit', sans-serif;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+        }
+        .legal-item:active { opacity: 0.7; }
+        
+        @media (max-width: 500px) {
+            .legal-item {
+                white-space: normal;
+                font-size: 12px;
+            }
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap');
+    </style>
+</head>
+<body>
+    <div class="cursor-glow" id="cursorGlow"></div>
+    <div class="cursor-halo" id="cursorHalo"></div>
+
+    <div class="site-container">
+        <div class="header">
+            <div class="logo-area" id="logoBtn">
+                <img class="logo-img" src="Images/Logo.png" alt="Root & Rise Logo">
+            </div>
+            <div class="brand-name" id="brandBtn">Root & Rise</div>
+            <div class="nav-links">
+                <button class="nav-link" id="homeBtn">Главная</button>
+                <button class="nav-link" id="aboutBtn">О нас</button>
+                <button class="nav-link" id="servicesBtn">Услуги</button>
+            </div>
+        </div>
+
+        <div class="hero-section" id="heroSection">
+            <div class="hero-content">
+                <h1 class="hero-title">Вертикальное озеленение</h1>
+                <p class="hero-subtitle">Живые стены, фито-модули и зелёные оазисы в любом пространстве. Превращаем вертикали в искусство.</p>
+            </div>
+            <div class="hero-image">
+                <img src="Images/verticaloFoto.jpg" alt="Вертикальное озеленение">
+            </div>
+        </div>
+
+        <h2 class="section-title">Типы фитостен</h2>
+        <div class="cards-grid">
+            <div class="service-card" id="card1">
+                <div class="card-icon">🧱</div>
+                <div class="card-title">Модульные системы</div>
+                <div class="card-text">Готовые блоки с автополивом — быстрый монтаж, лёгкий уход.</div>
+            </div>
+            <div class="service-card" id="card2">
+                <div class="card-icon">🌱</div>
+                <div class="card-title">Фитокартины</div>
+                <div class="card-text">Живые картины из стабилизированного мха и растений.</div>
+            </div>
+            <div class="service-card" id="card3">
+                <div class="card-icon">🏛️</div>
+                <div class="card-title">Архитектурное озеленение</div>
+                <div class="card-text">Оформление фасадов, колонн и арок. Преображаем бетонные конструкции.</div>
+            </div>
+            <div class="service-card" id="card4">
+                <div class="card-icon">💡</div>
+                <div class="card-title">Светодиодная досветка</div>
+                <div class="card-text">Специальные фито-лампы для вертикальных садов без естественного света.</div>
+            </div>
+        </div>
+
+        <div class="benefits-block" id="benefitsBlock">
+            <div class="benefit-item">
+                <div class="benefit-number">-40%</div>
+                <div class="benefit-text">снижение шума</div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-number">5 лет</div>
+                <div class="benefit-text">гарантии</div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-number">100+</div>
+                <div class="benefit-text">проектов</div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: center;">
+            <button class="back-button" id="backToHomeBtn">← Вернуться на главную</button>
+        </div>
+    </div>
+
+    <!-- ПОДВАЛ -->
+    <div class="footer">
+        <div class="footer__contacts">
+            <div class="phone-primary" id="phonePrimary">8(800) 808-00-08</div>
+            <div class="label-primary">контактный центр</div>
+            <div class="phone-secondary" id="phoneSecondary">+7(767) 465-57-93</div>
+            <div class="label-secondary">отдел заботы о пользователях</div>
+            <div class="social-icons">
+                <div class="social-icon" data-social="vk"><span>VK</span></div>
+                <div class="social-icon" data-social="tg"><span>TG</span></div>
+                <div class="social-icon" data-social="wa"><span>WA</span></div>
+            </div>
+        </div>
+        <div class="footer__nav">
+            <div class="nav-column">
+                <button class="footer-nav-item" data-nav="product">Продукт</button>
+                <button class="footer-nav-item" data-nav="tariffs">Тарифы</button>
+                <button class="footer-nav-item" data-nav="apps">Приложения</button>
+                <button class="footer-nav-item" data-nav="updates">Обновления</button>
+            </div>
+            <div class="nav-column">
+                <button class="footer-nav-item" data-nav="about">О компании</button>
+                <button class="footer-nav-item" data-nav="docs">Документы</button>
+                <button class="footer-nav-item" data-nav="blog">Блог</button>
+                <button class="footer-nav-item" data-nav="jobs">Вакансии</button>
+                <button class="footer-nav-item" data-nav="contacts">Контакты</button>
+            </div>
+        </div>
+        <div class="footer__bottom">
+            <div class="white-line-footer"></div>
+            <div class="footer__legal">
+                <div class="copyright">Root & Rise, 2025-2026</div>
+                <div class="legal-links">
+                    <button class="legal-item" data-legal="payment">Оплата</button>
+                    <button class="legal-item" data-legal="rules">Правила платформы</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Эффекты курсора (только на десктопе)
+        if (window.innerWidth > 768) {
+            (function() {
+                const cursorGlow = document.getElementById('cursorGlow');
+                const cursorHalo = document.getElementById('cursorHalo');
+                let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0, haloX = 0, haloY = 0;
+                document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+                function animateCursor() {
+                    glowX += (mouseX - glowX) * 0.12;
+                    glowY += (mouseY - glowY) * 0.12;
+                    haloX += (mouseX - haloX) * 0.08;
+                    haloY += (mouseY - haloY) * 0.08;
+                    cursorGlow.style.left = glowX + 'px';
+                    cursorGlow.style.top = glowY + 'px';
+                    cursorHalo.style.left = haloX + 'px';
+                    cursorHalo.style.top = haloY + 'px';
+                    requestAnimationFrame(animateCursor);
+                }
+                animateCursor();
+            })();
+        }
+
+        // Падающие лепестки — адаптивное количество
+        function createSakuraPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('sakura-petal');
+            const size = window.innerWidth < 768 ? 4 + Math.random() * 6 : 6 + Math.random() * 8;
+            petal.style.width = size + 'px';
+            petal.style.height = size + 'px';
+            petal.style.backgroundColor = `rgba(255, 59, 163, ${0.2 + Math.random() * 0.3})`;
+            petal.style.borderRadius = Math.random() > 0.5 ? '50% 0 50% 0' : '0 50% 0 50%';
+            petal.style.left = Math.random() * window.innerWidth + 'px';
+            petal.style.top = '-20px';
+            const duration = 12 + Math.random() * 15;
+            petal.style.animation = `sakuraFall ${duration}s linear forwards`;
+            petal.style.setProperty('--sway', (Math.random() - 0.5) * (window.innerWidth < 768 ? 40 : 80) + 'px');
+            petal.style.animationDelay = Math.random() * 8 + 's';
+            document.body.appendChild(petal);
+            setTimeout(() => petal.remove(), (duration + 8) * 1000);
+        }
+        
+        let sakuraInterval;
+        function startSakuraFall() {
+            const petalCount = window.innerWidth < 768 ? 10 : 20;
+            for (let i = 0; i < petalCount; i++) setTimeout(() => createSakuraPetal(), i * 200);
+            const intervalTime = window.innerWidth < 768 ? 2000 : 1300;
+            sakuraInterval = setInterval(() => {
+                const count = window.innerWidth < 768 ? 1 : 2;
+                for (let i = 0; i < count; i++) createSakuraPetal();
+            }, intervalTime);
+        }
+        
+        window.addEventListener('load', startSakuraFall);
+        window.addEventListener('beforeunload', () => clearInterval(sakuraInterval));
+
+        // Ripple + лепестки
+        function createRipple(event, element) {
+            const rect = element.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height) * 1.3;
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple-effect');
+            let clientX = event.clientX, clientY = event.clientY;
+            if (!clientX || !clientY) { clientX = rect.left + rect.width/2; clientY = rect.top + rect.height/2; }
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            ripple.style.width = ripple.style.height = `${size}px`;
+            ripple.style.left = `${x - size/2}px`;
+            ripple.style.top = `${y - size/2}px`;
+            ripple.style.position = 'absolute';
+            element.style.position = 'relative';
+            element.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 650);
+        }
+
+        function burstPetals(centerX, centerY) {
+            const petalCount = window.innerWidth < 768 ? 12 : 22;
+            for (let i = 0; i < petalCount; i++) {
+                const angle = (i / petalCount) * Math.PI * 2 + Math.random() * 0.7;
+                const petal = document.createElement('div');
+                petal.classList.add('petal-burst');
+                petal.innerHTML = '🌿';
+                petal.style.fontSize = `${(window.innerWidth < 768 ? 10 : 14) + Math.random() * (window.innerWidth < 768 ? 8 : 14)}px`;
+                petal.style.position = 'fixed';
+                petal.style.left = `${centerX + (Math.random() - 0.5) * (window.innerWidth < 768 ? 30 : 45)}px`;
+                petal.style.top = `${centerY + (Math.random() - 0.5) * (window.innerWidth < 768 ? 30 : 40)}px`;
+                petal.style.setProperty('--dx3', `${Math.cos(angle) * ((window.innerWidth < 768 ? 40 : 70) + Math.random() * (window.innerWidth < 768 ? 30 : 60))}px`);
+                petal.style.setProperty('--dy3', `${Math.sin(angle) * ((window.innerWidth < 768 ? 35 : 60) + Math.random() * (window.innerWidth < 768 ? 30 : 70)) - 30}px`);
+                petal.style.setProperty('--rot3', `${(Math.random() - 0.5) * 80 + 45}deg`);
+                document.body.appendChild(petal);
+                setTimeout(() => petal.remove(), 1300);
+            }
+        }
+
+        // Универсальная функция для обработки нажатий с переходом
+        function makeClickableWithRedirect(element, targetUrl) {
+            if (!element) return;
+            const handler = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                let clientX = e.clientX, clientY = e.clientY;
+                if (e.touches) {
+                    const touch = e.touches[0] || (e.changedTouches ? e.changedTouches[0] : null);
+                    if (touch) { clientX = touch.clientX; clientY = touch.clientY; }
+                }
+                createRipple({ clientX, clientY }, element);
+                burstPetals(clientX || element.getBoundingClientRect().left + element.offsetWidth/2, clientY || element.getBoundingClientRect().top + element.offsetHeight/2);
+                if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(35);
+                element.style.transform = 'scale(0.96)';
+                setTimeout(() => { if(element) element.style.transform = ''; }, 160);
+                const flash = document.createElement('div');
+                flash.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,59,163,0.25); pointer-events:none; z-index:9998; animation:flashFade 0.4s ease-out forwards;';
+                document.body.appendChild(flash);
+                setTimeout(() => flash.remove(), 400);
+                setTimeout(() => { window.location.href = targetUrl; }, 100);
+            };
+            element.addEventListener('mousedown', handler);
+            element.addEventListener('touchstart', handler, { passive: false });
+        }
+
+        // Навигация
+        makeClickableWithRedirect(document.getElementById('homeBtn'), 'index.html');
+        makeClickableWithRedirect(document.getElementById('logoBtn'), 'index.html');
+        makeClickableWithRedirect(document.getElementById('brandBtn'), 'index.html');
+        makeClickableWithRedirect(document.getElementById('backToHomeBtn'), 'index.html');
+        makeClickableWithRedirect(document.getElementById('aboutBtn'), 'about.html');
+        makeClickableWithRedirect(document.getElementById('servicesBtn'), 'services.html');
+
+        // Телефоны
+        const phonePrimary = document.getElementById('phonePrimary');
+        const phoneSecondary = document.getElementById('phoneSecondary');
+        if (phonePrimary) {
+            phonePrimary.addEventListener('click', () => window.location.href = 'tel:88008080008');
+            phonePrimary.addEventListener('touchstart', (e) => { e.preventDefault(); window.location.href = 'tel:88008080008'; });
+        }
+        if (phoneSecondary) {
+            phoneSecondary.addEventListener('click', () => window.location.href = 'tel:+77674655793');
+            phoneSecondary.addEventListener('touchstart', (e) => { e.preventDefault(); window.location.href = 'tel:+77674655793'; });
+        }
+
+        // Соцсети
+        const socialVk = document.querySelector('[data-social="vk"]');
+        const socialTg = document.querySelector('[data-social="tg"]');
+        const socialWa = document.querySelector('[data-social="wa"]');
+        if (socialVk) socialVk.addEventListener('click', () => window.open('https://vk.com', '_blank'));
+        if (socialTg) socialTg.addEventListener('click', () => window.open('https://t.me', '_blank'));
+        if (socialWa) socialWa.addEventListener('click', () => window.open('https://wa.me', '_blank'));
+
+        // Добавляем эффекты нажатия для всех кликабельных элементов без перехода
+        const clickableItems = document.querySelectorAll('.footer-nav-item, .legal-item, .service-card');
+        clickableItems.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                let clientX = e.clientX, clientY = e.clientY;
+                if (e.touches) {
+                    const touch = e.touches[0];
+                    if (touch) { clientX = touch.clientX; clientY = touch.clientY; }
+                }
+                createRipple({ clientX, clientY }, btn);
+                burstPetals(clientX || btn.getBoundingClientRect().left + btn.offsetWidth/2, clientY || btn.getBoundingClientRect().top + btn.offsetHeight/2);
+                if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(20);
+                btn.style.transform = 'scale(0.97)';
+                setTimeout(() => { if(btn) btn.style.transform = ''; }, 150);
+            });
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                createRipple({ clientX: touch.clientX, clientY: touch.clientY }, btn);
+                burstPetals(touch.clientX, touch.clientY);
+                if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(20);
+                btn.style.transform = 'scale(0.97)';
+                setTimeout(() => { if(btn) btn.style.transform = ''; }, 150);
+            }, { passive: false });
+        });
+
+        // Intersection Observer для анимаций
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.15 });
+        
+        observer.observe(document.getElementById('heroSection'));
+        observer.observe(document.getElementById('benefitsBlock'));
+        document.querySelectorAll('.service-card').forEach(card => observer.observe(card));
+        
+        setTimeout(() => {
+            const hero = document.getElementById('heroSection');
+            if(hero && hero.getBoundingClientRect().top < window.innerHeight) 
+                hero.classList.add('visible');
+        }, 100);
+    </script>
+</body>
+</html>
